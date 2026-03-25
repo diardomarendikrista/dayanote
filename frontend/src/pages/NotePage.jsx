@@ -1,0 +1,214 @@
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import axios from "axios";
+import CollaborativeEditor from "../components/CollaborativeEditor";
+import { useAppStore } from "../store/useAppStore";
+import { FileText, LogIn, Eye, Edit3, Globe } from "lucide-react";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
+
+const NotePage = () => {
+  const { id } = useParams();
+  const { token } = useAppStore();
+  const [note, setNote] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNote = async () => {
+      try {
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await axios.get(`${API_URL}/api/notes/${id}`, { headers });
+        setNote(res.data);
+      } catch (err) {
+        if (err.response?.status === 403) {
+          setError(
+            "This memorandum is private. Only authorized personnel can access.",
+          );
+        } else if (err.response?.status === 404) {
+          setError("Memorandum not found in the directory.");
+        } else {
+          setError("Access restricted. Technical authorization required.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNote();
+  }, [id, token]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0c0a09] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 bg-[#a81c1c]/20 blur-xl rounded-full" />
+            <div className="w-12 h-12 border-2 border-[#a81c1c] border-t-transparent rounded-full animate-spin relative z-10" />
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-500 animate-pulse">
+            Retrieving Document...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#0c0a09] flex items-center justify-center p-6">
+        <div className="text-center space-y-8 max-w-sm">
+          <div className="relative group mx-auto w-fit">
+            <div className="absolute inset-0 bg-[#a81c1c]/10 blur-2xl rounded-full transition-all group-hover:bg-[#a81c1c]/20" />
+            <div className="relative w-24 h-24 bg-[#1c1917] border border-stone-800 rounded-[2.5rem] flex items-center justify-center text-[#a81c1c] shadow-2xl rotate-6 group-hover:rotate-0 transition-transform duration-500">
+              <FileText size={40} />
+            </div>
+          </div>
+          <div className="space-y-4">
+            <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
+              Restricted
+            </h2>
+            <p className="text-stone-500 text-[10px] font-black uppercase tracking-[0.2em] leading-relaxed">
+              {error}
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 pt-4">
+            <Link
+              to="/login"
+              className="flex items-center justify-center gap-2 px-8 py-4 bg-[#a81c1c] hover:bg-[#991b1b] text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-[#a81c1c]/20 active:scale-95"
+            >
+              <LogIn size={14} /> Request Authorization
+            </Link>
+            <Link
+              to="/dashboard"
+              className="px-8 py-4 bg-stone-900 border border-stone-800 hover:border-stone-600 text-stone-400 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+            >
+              Return to Base
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isReadOnly = note.role === "VIEWER";
+
+  return (
+    <div className="min-h-screen bg-[#0c0a09] font-['Inter'] text-stone-300">
+      {/* Top Bar */}
+      <div className="h-24 border-b border-stone-800/80 flex items-center justify-between px-12 bg-[#0c0a09]/80 sticky top-0 z-50 backdrop-blur-xl">
+        <div className="flex items-center gap-8 min-w-0">
+          <Link
+            to="/dashboard"
+            className="text-2xl font-black tracking-tighter text-white hover:opacity-80 transition-opacity"
+          >
+            DAYA<span className="text-[#a81c1c]">NOTE</span>
+          </Link>
+          <div className="w-px h-6 bg-stone-800 shrink-0" />
+          <div className="flex items-center gap-4 overflow-hidden">
+            <div
+              className={`p-2 rounded-lg bg-stone-900 border border-stone-800 flex items-center gap-2 shrink-0 ${!isReadOnly ? "text-emerald-500 border-emerald-500/20" : "text-[#a81c1c] border-[#a81c1c]/20"}`}
+            >
+              {isReadOnly ? <Eye size={16} /> : <Edit3 size={16} />}
+              <span className="text-[8px] font-black uppercase tracking-[0.2em]">
+                {isReadOnly ? "View Only" : "Editor Access"}
+              </span>
+            </div>
+            <h1 className="text-lg font-black text-white uppercase tracking-tighter truncate min-w-0">
+              {note?.title || "Untitled Memorandum"}
+            </h1>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 shrink-0">
+          <div className="flex flex-col items-end mr-4 hidden sm:flex">
+            <span className="text-[8px] font-black text-[#a81c1c] uppercase tracking-[0.2em]">
+              Originator
+            </span>
+            <span className="text-[10px] font-black text-white uppercase tracking-widest">
+              {note.owner?.name}
+            </span>
+          </div>
+          {token ? (
+            <Link
+              to="/dashboard"
+              className="px-6 py-3 bg-stone-900 border border-stone-800 hover:border-[#a81c1c]/50 text-stone-400 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all shadow-lg shadow-black/40"
+            >
+              Open Dashboard
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center gap-2 px-6 py-3 bg-[#a81c1c] hover:bg-[#991b1b] text-white rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-[#a81c1c]/20 active:scale-95"
+            >
+              <LogIn size={13} /> Secure Login
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* Hero Header Area */}
+      <div className="bg-[#12100f] border-b border-stone-800/50 pt-16 pb-8">
+        <div className="max-w-4xl mx-auto px-8 flex justify-between items-end">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Globe
+                size={14}
+                className="text-emerald-500"
+              />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">
+                Public Secure Link Active
+              </span>
+            </div>
+            <h2 className="text-5xl font-black text-white uppercase tracking-tight leading-none">
+              {note?.title || "Memorandum"}
+            </h2>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] font-black text-stone-600 uppercase tracking-[0.2em]">
+              Issue Date
+            </p>
+            <p className="text-xs font-bold text-stone-400">
+              {new Date(note?.createdAt).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Editor Content Area */}
+      <div className="max-w-4xl mx-auto px-8 pb-32 pt-12">
+        <div className="bg-[#12100f] border border-stone-800/50 rounded-[3rem] p-4 shadow-2xl relative">
+          <div className="absolute top-8 right-12 z-10 pointer-events-none">
+            <div className="text-[60px] font-black text-white/[0.02] uppercase tracking-tighter leading-none select-none">
+              {isReadOnly ? "RESTRICTED" : "AUTHORIZED"}
+            </div>
+          </div>
+          <CollaborativeEditor
+            key={id}
+            noteId={id}
+            readOnly={isReadOnly}
+          />
+        </div>
+
+        {/* Footer Meta */}
+        <div className="mt-12 flex justify-between items-center text-stone-600">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-stone-900 border border-stone-800 flex items-center justify-center font-black text-xs">
+              DN
+            </div>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-widest leading-none">
+                Memorandum ID
+              </p>
+              <p className="text-[10px] font-mono mt-1">{note.id}</p>
+            </div>
+          </div>
+          <p className="text-[9px] font-black uppercase tracking-[0.3em]">
+            Built for Daya Lima Infrastructure
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default NotePage;

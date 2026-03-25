@@ -9,7 +9,8 @@ const { PrismaClient } = require('@prisma/client');
 const jwt = require('jsonwebtoken');
 const authController = require('./controllers/auth.controller');
 const noteController = require('./controllers/note.controller');
-const authMiddleware = require('./middlewares/auth.middleware');
+const authMiddleware = require('./middlewares/auth.middleware').authMiddleware;
+const optionalAuthMiddleware = require('./middlewares/auth.middleware').optionalAuthMiddleware;
 
 const prisma = new PrismaClient();
 const app = express();
@@ -26,9 +27,13 @@ app.post('/api/auth/login', authController.login);
 // Note routes
 app.get('/api/notes', authMiddleware, noteController.getNotes);
 app.post('/api/notes', authMiddleware, noteController.createNote);
-app.get('/api/notes/:id', authMiddleware, noteController.getNote);
+app.get('/api/notes/:id', optionalAuthMiddleware, noteController.getNote);
 app.put('/api/notes/:id', authMiddleware, noteController.updateNote);
 app.delete('/api/notes/:id', authMiddleware, noteController.deleteNote);
+
+// Permission routes
+app.post('/api/notes/:id/permissions', authMiddleware, noteController.addPermission);
+app.delete('/api/notes/:id/permissions/:userId', authMiddleware, noteController.removePermission);
 
 // Socket.io for global toast notifications
 io.on('connection', (socket) => {
@@ -39,30 +44,66 @@ io.on('connection', (socket) => {
 
 // Hocuspocus Server
 const hocuspocusServer = new Hocuspocus({
-  port: process.env.PORT || 4015,
   async onAuthenticate(data) {
-    const { token } = data;
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      return {
-        user: { id: decoded.id, name: decoded.name },
-      };
-    } catch (e) {
-      return null; // Deny access
+    const { token, documentName } = data;
+
+    // 1. Identify User
+    let user = null;
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        user = { id: decoded.id, name: decoded.name };
+      } catch (e) {
+        // Invalid token? Treat as guest if we want to support public access
+      }
+    }
+
+    if (!user) {
+      user = { id: `guest_${Math.random().toString(36).substr(2, 9)}`, name: 'Guest', isGuest: true };
+    }
+
+    // 2. Check Permissions for this specific document
+    const note = await prisma.note.findUnique({
+      where: { id: documentName },
+      include: { permissions: true }
+    });
+
+    if (!note) throw new Error('Note not found');
+
+    const isOwner = note.ownerId === user.id;
+    const userPermission = note.permissions.find(p => p.userId === user.id);
+    const hasPermission = userPermission || isOwner;
+
+    if (!hasPermission && !note.isPublic) {
+      throw new Error('Access denied');
+    }
+
+    const role = isOwner ? 'OWNER' : (userPermission?.role || note.publicRole);
+
+    // Return context for other hooks
+    return { user, role };
+  },
+  async onLoadDocument(data) {
+    const { documentName } = data;
+    const note = await prisma.note.findUnique({ where: { id: documentName } });
+    return note?.content ? Buffer.from(note.content, 'hex') : null;
+  },
+  async onConnect(data) {
+    const { connection, context } = data;
+    // Set readOnly based on the role we determined in onAuthenticate
+    if (context?.role === 'VIEWER') {
+      connection.readOnly = true;
     }
   },
   extensions: [
     new Database({
       fetch: async ({ documentName }) => {
+        // We already handled fetching in onLoadDocument, but Database extension might call this.
+        // Hocuspocus documentation says onLoadDocument is the entry point if provided.
+        // Let's keep this as fallback.
         const note = await prisma.note.findUnique({
           where: { id: documentName },
         });
-        // Hocuspocus expects a Uint8Array for binary data (Yjs state)
-        // If we store it as a Buffer in JSONB or separate field, we return it.
-        // For simplicity, we assume 'content' might store the Yjs update buffer as binary if we use another field, 
-        // but Prisma JSONB might not be best for binary. 
-        // Let's assume we store it as stringified JSON or hex for now if needed, 
-        // or just return null to start a new document if empty.
         return note?.content ? Buffer.from(note.content, 'hex') : null;
       },
       store: async ({ documentName, state }) => {
@@ -82,8 +123,25 @@ const hocuspocusServer = new Hocuspocus({
   ],
 });
 
+const { WebSocketServer } = require('ws');
+const wss = new WebSocketServer({ noServer: true });
+
+wss.on('connection', (ws, request) => {
+  // Prevent invalid WebSocket frames from crashing the process
+  ws.on('error', (err) => {
+    console.warn('[WS] Connection error (ignored):', err.code || err.message);
+  });
+  hocuspocusServer.handleConnection(ws, request);
+});
+
+wss.on('error', (err) => {
+  console.warn('[WS Server] Error (ignored):', err.message);
+});
+
 server.on('upgrade', (request, socket, head) => {
-  hocuspocusServer.handleUpgrade(request, socket, head);
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit('connection', ws, request);
+  });
 });
 
 const PORT = process.env.PORT || 4015;

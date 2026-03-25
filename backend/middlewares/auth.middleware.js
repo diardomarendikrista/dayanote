@@ -16,4 +16,22 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = authMiddleware;
+// New optional auth middleware
+const optionalAuthMiddleware = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+  if (!token) {
+    req.user = null;
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (ex) {
+    req.user = null;
+    next();
+  }
+};
+
+module.exports = { authMiddleware, optionalAuthMiddleware };

@@ -1,22 +1,221 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-primary: #3b82f6;
-  --color-brand-secondary: #10b981;
+  --color-brand-primary: #a81c1c; /* Deep Red from Daya Lima */
+  --color-brand-secondary: #7f1d1d; /* Darker Red */
+  --color-accent: #f8fafc;
 }
 
 :root {
   --background: #ffffff;
   --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --border: #e2e8f0;
+  --input: #f8fafc;
 }
 
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --background: #0c0a09; /* Stone 950 / Black */
+  --foreground: #f5f5f4;
+  --card: #1c1917; /* Stone 900 */
+  --card-foreground: #f5f5f4;
+  --border: #292524;
+  --input: #292524;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Inter", sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Custom Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dark .glass {
+  background: rgba(28, 25, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gradient-text {
+  background: linear-gradient(to right, var(--color-brand-primary), #dc2626);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-border {
+  border-color: var(--color-brand-primary);
+}
+
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(168, 28, 28, 0.2);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 28, 28, 0.5);
+}
+
+/* TipTap Editor Typography */
+.ProseMirror {
+  color: #d6d3d1; /* stone-300 */
+  font-size: 1rem;
+  line-height: 1.75;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.ProseMirror p {
+  margin: 0 0 0.75em;
+}
+
+.ProseMirror h1 {
+  color: #fff;
+  font-size: 2em;
+  font-weight: 900;
+  margin: 1em 0 0.5em;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.ProseMirror h2 {
+  color: #f5f5f4;
+  font-size: 1.5em;
+  font-weight: 700;
+  margin: 1em 0 0.5em;
+  letter-spacing: -0.02em;
+}
+
+.ProseMirror h3 {
+  color: #e7e5e4;
+  font-size: 1.25em;
+  font-weight: 700;
+  margin: 1em 0 0.5em;
+}
+
+.ProseMirror strong {
+  color: #fff;
+}
+
+.ProseMirror em {
+  color: #d6d3d1;
+  font-style: italic;
+}
+
+.ProseMirror s {
+  text-decoration: line-through;
+  color: #78716c;
+}
+
+.ProseMirror code {
+  background: #1c1917;
+  color: #a81c1c;
+  border: 1px solid #292524;
+  border-radius: 0.25rem;
+  padding: 0.1em 0.3em;
+  font-size: 0.88em;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+.ProseMirror pre {
+  background: #1c1917;
+  border: 1px solid #292524;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+
+.ProseMirror pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #d6d3d1;
+  font-size: 0.9em;
+}
+
+.ProseMirror blockquote {
+  border-left: 3px solid #a81c1c;
+  padding-left: 1rem;
+  margin: 1em 0;
+  color: #78716c;
+  font-style: italic;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.ProseMirror li {
+  margin: 0.25em 0;
+}
+
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.ProseMirror ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.ProseMirror ul[data-type="taskList"] li input[type="checkbox"] {
+  margin-top: 0.25rem;
+  accent-color: #a81c1c;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ProseMirror hr {
+  border: none;
+  border-top: 1px solid #292524;
+  margin: 1.5em 0;
+}
+
+.ProseMirror p.is-empty::before {
+  content: attr(data-placeholder);
+  color: #44403c;
+  pointer-events: none;
+  float: left;
+  height: 0;
 }

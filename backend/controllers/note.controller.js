@@ -8,12 +8,23 @@ exports.getNotes = async (req, res) => {
         OR: [
           { ownerId: req.user.id },
           { permissions: { some: { userId: req.user.id } } },
-          { isPublic: true },
         ],
+      },
+      include: {
+        permissions: { where: { userId: req.user.id } },
       },
       orderBy: { updatedAt: 'desc' },
     });
-    res.json(notes);
+
+    // Map to include role
+    const notesWithRole = notes.map(note => {
+      let role = 'VIEWER';
+      if (note.ownerId === req.user.id) role = 'OWNER';
+      else if (note.permissions.length > 0) role = note.permissions[0].role;
+      return { ...note, role };
+    });
+
+    res.json(notesWithRole);
   } catch (error) {
     res.status(400).json({ error: 'Failed to fetch notes: ' + error.message });
   }
@@ -28,7 +39,7 @@ exports.createNote = async (req, res) => {
         ownerId: req.user.id,
       },
     });
-    res.status(201).json(note);
+    res.status(201).json({ ...note, role: 'OWNER' });
   } catch (error) {
     res.status(400).json({ error: 'Failed to create note: ' + error.message });
   }
@@ -37,32 +48,87 @@ exports.createNote = async (req, res) => {
 exports.getNote = async (req, res) => {
   try {
     const { id } = req.params;
-    const note = await prisma.note.findFirst({
-      where: {
-        id,
-        OR: [
-          { ownerId: req.user.id },
-          { permissions: { some: { userId: req.user.id } } },
-          { isPublic: true },
-        ],
+    const note = await prisma.note.findUnique({
+      where: { id },
+      include: {
+        owner: { select: { id: true, name: true, email: true } },
+        permissions: { include: { user: { select: { id: true, name: true, email: true } } } },
       },
     });
+
     if (!note) return res.status(404).json({ error: 'Note not found' });
-    res.json(note);
+
+    // Access check: Owner OR Public OR has explicit Permission
+    const isOwner = req.user && note.ownerId === req.user.id;
+    const hasPermission = req.user && note.permissions.some(p => p.userId === req.user.id);
+
+    if (!isOwner && !note.isPublic && !hasPermission) {
+      return res.status(403).json({ error: 'Access restricted' });
+    }
+
+    // Determine role for the response
+    let role = 'VIEWER';
+    if (isOwner) role = 'OWNER';
+    else if (hasPermission) role = note.permissions.find(p => p.userId === req.user.id).role;
+    else if (note.isPublic) role = note.publicRole;
+
+    res.json({ ...note, role });
   } catch (error) {
     res.status(400).json({ error: 'Failed to fetch note: ' + error.message });
+  }
+};
+
+exports.addPermission = async (req, res) => {
+  try {
+    const { id } = req.params; // note id
+    const { email, role } = req.body;
+
+    const note = await prisma.note.findUnique({ where: { id } });
+    if (note.ownerId !== req.user.id) return res.status(403).json({ error: 'Only owners can share' });
+
+    const targetUser = await prisma.user.findUnique({ where: { email } });
+    if (!targetUser) return res.status(404).json({ error: 'User not found' });
+
+    const permission = await prisma.permission.upsert({
+      where: { userId_noteId: { userId: targetUser.id, noteId: id } },
+      update: { role },
+      create: { userId: targetUser.id, noteId: id, role },
+    });
+
+    res.json(permission);
+  } catch (error) {
+    res.status(400).json({ error: 'Failed to share: ' + error.message });
+  }
+};
+
+exports.removePermission = async (req, res) => {
+  try {
+    const { id, userId } = req.params;
+    const note = await prisma.note.findUnique({ where: { id } });
+    if (note.ownerId !== req.user.id) return res.status(403).json({ error: 'Unauthorized' });
+
+    await prisma.permission.delete({
+      where: { userId_noteId: { userId, noteId: id } },
+    });
+
+    res.json({ message: 'Permission removed' });
+  } catch (error) {
+    res.status(400).json({ error: 'Failed to remove permission' });
   }
 };
 
 exports.updateNote = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, isPublic } = req.body;
-    const note = await prisma.note.update({
+    const { title, content, isPublic, publicRole } = req.body;
+    const note = await prisma.note.findUnique({ where: { id } });
+    if (note.ownerId !== req.user.id) return res.status(403).json({ error: 'Unauthorized' });
+
+    const updatedNote = await prisma.note.update({
       where: { id },
-      data: { title, isPublic },
+      data: { title, content, isPublic, publicRole },
     });
-    res.json(note);
+    res.json({ ...updatedNote, role: 'OWNER' });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update note: ' + error.message });
   }

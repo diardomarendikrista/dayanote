@@ -8,23 +8,24 @@ datasource db {
 }
 
 model User {
-  id        String       @id @default(uuid())
-  email     String       @unique
-  password  String
-  name      String?
-  notes     Note[]
+  id          String       @id @default(uuid())
+  email       String       @unique
+  password    String
+  name        String?
+  notes       Note[]
   permissions Permission[]
 }
 
 model Note {
-  id        String       @id @default(uuid())
-  title     String
-  content   Json?
-  isPublic  Boolean      @default(false)
-  ownerId   String
-  owner     User         @relation(fields: [ownerId], references: [id])
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id          String       @id @default(uuid())
+  title       String
+  content     Json?
+  isPublic    Boolean      @default(false)
+  publicRole  Role         @default(VIEWER)
+  ownerId     String
+  owner       User         @relation(fields: [ownerId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   permissions Permission[]
 }
 

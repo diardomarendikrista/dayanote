@@ -8,6 +8,8 @@ import { useAppStore } from "./store/useAppStore";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import NotePage from "./pages/NotePage";
+import ToastContainer from "./components/Toast";
 import { useEffect } from "react";
 
 const ProtectedRoute = ({ children }) => {
@@ -49,6 +51,10 @@ function App() {
           }
         />
         <Route
+          path="/note/:id"
+          element={<NotePage />}
+        />
+        <Route
           path="/"
           element={
             <Navigate
@@ -58,6 +64,7 @@ function App() {
           }
         />
       </Routes>
+      <ToastContainer />
     </Router>
   );
 }
