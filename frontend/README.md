@@ -1,16 +1,34 @@
-# React + Vite
+# DayaNote Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The frontend of DayaNote is built for speed, responsiveness, and a premium user experience. It leverages modern web technologies to provide a native-app feel.
 
-Currently, two official plugins are available:
+## 🛠️ Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Framework**: React 19 + Vite 6
+- **Styling**: Tailwind CSS v4 (Industrial Theme)
+- **State Management**: Zustand
+- **Editor**: TipTap (ProseMirror) with Yjs integration
+- **Synchronization**: Hocuspocus Provider
+- **Icons**: Lucide React
+- **Notifications**: Custom Industrial Toast System
 
-## React Compiler
+## ✨ Highlights
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **PWA Ready**: Installable on desktop and mobile with offline support.
+- **Collaborative Cursor**: (Alpha) Real-time presence indicators.
+- **Responsive Design**: Optimized for both desktop workspaces and mobile viewing.
+- **Optimized Persistence**: Local changes are stored in IndexedDB before syncing.
 
-## Expanding the ESLint configuration
+## 🛠️ Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Install dependencies: `npm install`
+2. Configure `.env`:
+   - `VITE_API_URL`: Your backend API URL.
+   - `VITE_WS_URL`: Your Hocuspocus WebSocket URL.
+3. Start development: `npm run dev`
+
+## 📁 Source Overview
+
+- `/src/components/CollaborativeEditor.jsx`: The heart of the app, managing TipTap and WebSocket sync.
+- `/src/components/NoteSettingsModal.jsx`: Access control UI for managing permissions.
+- `/src/pages/NotePage.jsx`: The public/shared view with specific guest logic.
