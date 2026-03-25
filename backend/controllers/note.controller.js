@@ -1,6 +1,9 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// Helper to get Socket.io from request
+const getIO = (req) => req.app.get('io');
+
 exports.getNotes = async (req, res) => {
   try {
     const notes = await prisma.note.findMany({
@@ -12,6 +15,7 @@ exports.getNotes = async (req, res) => {
       },
       include: {
         permissions: { where: { userId: req.user.id } },
+        _count: { select: { permissions: true } },
       },
       orderBy: { updatedAt: 'desc' },
     });
@@ -53,6 +57,7 @@ exports.getNote = async (req, res) => {
       include: {
         owner: { select: { id: true, name: true, email: true } },
         permissions: { include: { user: { select: { id: true, name: true, email: true } } } },
+        _count: { select: { permissions: true } },
       },
     });
 
@@ -88,12 +93,19 @@ exports.addPermission = async (req, res) => {
 
     const targetUser = await prisma.user.findUnique({ where: { email } });
     if (!targetUser) return res.status(404).json({ error: 'User not found' });
+    if (targetUser.id === req.user.id) return res.status(400).json({ error: 'You are already the owner of this note' });
 
     const permission = await prisma.permission.upsert({
       where: { userId_noteId: { userId: targetUser.id, noteId: id } },
       update: { role },
       create: { userId: targetUser.id, noteId: id, role },
     });
+
+    // Notify target user
+    const io = getIO(req);
+    if (io) {
+      io.to(`user_${targetUser.id}`).emit('access_changed', { noteId: id, role });
+    }
 
     res.json(permission);
   } catch (error) {
@@ -110,6 +122,12 @@ exports.removePermission = async (req, res) => {
     await prisma.permission.delete({
       where: { userId_noteId: { userId, noteId: id } },
     });
+
+    // Notify target user that access is revoked
+    const io = getIO(req);
+    if (io) {
+      io.to(`user_${userId}`).emit('access_revoked', { noteId: id });
+    }
 
     res.json({ message: 'Permission removed' });
   } catch (error) {
@@ -128,6 +146,19 @@ exports.updateNote = async (req, res) => {
       where: { id },
       data: { title, content, isPublic, publicRole },
     });
+
+    // If made private, we might need to kick anonymous or unauthorized users.
+    // For now, let's at least broadcast the update to the note room.
+    const io = getIO(req);
+    if (io) {
+      io.to(`note_${id}`).emit('note_updated', updatedNote);
+
+      if (isPublic === false || publicRole !== note.publicRole) {
+        // Force re-verification for any privacy or role change
+        io.to(`note_${id}`).emit('check_access', { noteId: id });
+      }
+    }
+
     res.json({ ...updatedNote, role: 'OWNER' });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update note: ' + error.message });
@@ -137,6 +168,13 @@ exports.updateNote = async (req, res) => {
 exports.deleteNote = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Notify all collaborators/viewers in the room
+    const io = getIO(req);
+    if (io) {
+      io.to(`note_${id}`).emit('note_deleted', { noteId: id });
+    }
+
     await prisma.note.delete({ where: { id, ownerId: req.user.id } });
     res.json({ message: 'Note deleted' });
   } catch (error) {

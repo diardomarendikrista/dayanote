@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { cn } from "../utils/cn";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -46,7 +47,7 @@ const Register = () => {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-3">
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl text-[11px] font-bold uppercase tracking-wider flex items-center gap-3 font-['Outfit']">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0"></span>
             {error}
           </div>
@@ -57,8 +58,8 @@ const Register = () => {
           className="space-y-6"
         >
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">
-              Full Name
+            <label className="text-[11px] font-black uppercase tracking-widest text-stone-400 ml-1 font-['Outfit']">
+              Owner Name
             </label>
             <input
               type="text"
@@ -70,8 +71,8 @@ const Register = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">
-              Email address
+            <label className="text-[11px] font-black uppercase tracking-widest text-stone-400 ml-1 font-['Outfit']">
+              Email Address
             </label>
             <input
               type="email"
@@ -83,8 +84,8 @@ const Register = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">
-              Password
+            <label className="text-[11px] font-black uppercase tracking-widest text-stone-400 ml-1 font-['Outfit']">
+              Secure Password
             </label>
             <input
               type="password"
@@ -103,7 +104,7 @@ const Register = () => {
           </button>
         </form>
 
-        <p className="mt-10 text-center text-[10px] font-black uppercase tracking-[0.2em] text-stone-600">
+        <p className="mt-10 text-center text-[11px] font-black uppercase tracking-[0.2em] text-stone-600 font-['Outfit']">
           Already have an account?{" "}
           <Link
             to="/login"

@@ -9,6 +9,7 @@ import { IndexeddbPersistence } from "y-indexeddb";
 import { useEffect, useState, useMemo } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { Lock, Eye } from "lucide-react";
+import { cn } from "../utils/cn";
 
 // Toolbar button component
 const ToolbarButton = ({ onClick, isActive, disabled, title, children }) => (
@@ -16,11 +17,13 @@ const ToolbarButton = ({ onClick, isActive, disabled, title, children }) => (
     onClick={onClick}
     disabled={disabled}
     title={title}
-    className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-bold transition-all ${
+    className={cn(
+      "w-8 h-8 flex items-center justify-center rounded-lg text-sm font-bold transition-all",
       isActive
         ? "bg-[#a81c1c] text-white shadow-sm"
-        : "text-stone-400 hover:text-white hover:bg-stone-800"
-    } disabled:opacity-30 disabled:cursor-not-allowed`}
+        : "text-stone-400 hover:text-white hover:bg-stone-800",
+      disabled && "opacity-30 cursor-not-allowed",
+    )}
   >
     {children}
   </button>
@@ -182,7 +185,8 @@ const EditorInstance = ({ ydoc, readOnly }) => {
       content: "",
       editorProps: {
         attributes: {
-          class: "focus:outline-none min-h-[500px] max-w-none prose-invert",
+          class:
+            "focus:outline-none min-h-[500px] max-w-none prose-invert text-base md:text-lg leading-relaxed",
         },
       },
     },
@@ -197,7 +201,7 @@ const EditorInstance = ({ ydoc, readOnly }) => {
         editor={editor}
         readOnly={readOnly}
       />
-      <div className="p-10">
+      <div className="p-10 md:p-14">
         <EditorContent editor={editor} />
       </div>
     </div>
@@ -244,11 +248,11 @@ const CollaborativeEditor = ({ noteId, readOnly = false }) => {
           size={32}
           className="text-[#a81c1c] mb-2"
         />
-        <h3 className="text-sm font-black text-white uppercase tracking-widest">
+        <h3 className="text-sm font-black text-white uppercase tracking-widest font-['Outfit']">
           Access Restricted
         </h3>
-        <p className="text-[10px] text-stone-500 uppercase tracking-widest">
-          You do not have permission to view this memorandum.
+        <p className="text-xs text-stone-500 uppercase tracking-widest font-['Outfit']">
+          You do not have permission to view this note.
         </p>
       </div>
     );
@@ -258,8 +262,8 @@ const CollaborativeEditor = ({ noteId, readOnly = false }) => {
     return (
       <div className="flex flex-col justify-center items-center min-h-[400px] space-y-4">
         <div className="w-10 h-10 border-2 border-[#a81c1c] border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest">
-          Synchronizing Yjs Instance...
+        <p className="text-xs font-black text-stone-500 uppercase tracking-widest font-['Outfit']">
+          Synchronizing Instance...
         </p>
       </div>
     );
@@ -270,14 +274,18 @@ const CollaborativeEditor = ({ noteId, readOnly = false }) => {
       {/* Status badge */}
       <div className="absolute -top-10 right-0 flex items-center gap-2">
         <div
-          className={`flex items-center gap-2 px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border ${
+          className={cn(
+            "flex items-center gap-2 px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
             status === "connected"
               ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-              : "bg-orange-500/10 text-orange-400 border-orange-500/20 animate-pulse"
-          }`}
+              : "bg-orange-500/10 text-orange-400 border-orange-500/20 animate-pulse",
+          )}
         >
           <div
-            className={`w-1 h-1 rounded-full ${status === "connected" ? "bg-emerald-500" : "bg-orange-400"}`}
+            className={cn(
+              "w-1 h-1 rounded-full",
+              status === "connected" ? "bg-emerald-500" : "bg-orange-400",
+            )}
           />
           {status === "connected"
             ? readOnly
@@ -287,7 +295,7 @@ const CollaborativeEditor = ({ noteId, readOnly = false }) => {
         </div>
       </div>
 
-      <div className="bg-[#100e0d] rounded-[2rem] border border-stone-800/80 overflow-hidden shadow-[0_0_50px_-12px_rgba(168,28,28,0.1)] focus-within:border-[#a81c1c]/30 transition-all">
+      <div className="bg-[#100e0d] rounded-[2rem] border border-stone-800/80 overflow-hidden shadow-[0_0_80px_-20px_rgba(168,28,28,0.2)] focus-within:border-[#a81c1c]/50 transition-all duration-500">
         <EditorInstance
           ydoc={ydoc}
           readOnly={readOnly}

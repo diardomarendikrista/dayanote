@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Check, Info, AlertTriangle, X } from "lucide-react";
+import { cn } from "../utils/cn";
 
 const ICONS = {
   success: {
@@ -54,20 +55,28 @@ const ToastItem = ({ id, message, type, onRemove }) => {
 
   return (
     <div
-      className={`flex items-center gap-3 px-5 py-4 rounded-2xl border ${bg} ${border} shadow-2xl backdrop-blur-md transition-all duration-300 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+      className={cn(
+        "flex items-center gap-3 px-5 py-4 rounded-2xl border shadow-2xl backdrop-blur-md transition-all duration-300 font-['Outfit']",
+        bg,
+        border,
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+      )}
     >
-      <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
+      <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", dot)} />
       <Icon
         size={15}
         className={text}
       />
-      <span className={`text-xs font-bold ${text}`}>{message}</span>
+      <span className={cn("text-[13px] font-bold", text)}>{message}</span>
       <button
         onClick={() => {
           setVisible(false);
           setTimeout(() => onRemove(id), 300);
         }}
-        className={`ml-3 ${text} opacity-60 hover:opacity-100 transition-opacity`}
+        className={cn(
+          "ml-3 opacity-60 hover:opacity-100 transition-opacity",
+          text,
+        )}
       >
         <X size={13} />
       </button>

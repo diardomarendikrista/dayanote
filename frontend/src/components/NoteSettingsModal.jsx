@@ -13,6 +13,7 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "./Toast";
+import { cn } from "../utils/cn";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
 
@@ -21,6 +22,23 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
   const [role, setRole] = useState("VIEWER");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Fetch full note data (with collaborator list) whenever modal opens
+  useEffect(() => {
+    if (isOpen && note?.id) {
+      const fetchFullNote = async () => {
+        try {
+          const res = await axios.get(`${API_URL}/api/notes/${note.id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          onUpdate(res.data);
+        } catch (err) {
+          console.error("Failed to refresh note details", err);
+        }
+      };
+      fetchFullNote();
+    }
+  }, [isOpen, note?.id, token]);
 
   if (!isOpen || !note) return null;
 
@@ -76,6 +94,24 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
     }
   };
 
+  const handleUpdatePermission = async (targetEmail, newRole) => {
+    try {
+      await axios.post(
+        `${API_URL}/api/notes/${note.id}/permissions`,
+        { email: targetEmail, role: newRole },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      toast.success(`Role updated for ${targetEmail}`);
+      // Refresh note data
+      const res = await axios.get(`${API_URL}/api/notes/${note.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      onUpdate(res.data);
+    } catch (err) {
+      toast.error("Failed to update role");
+    }
+  };
+
   const handleRemovePermission = async (userId) => {
     try {
       await axios.delete(
@@ -109,8 +145,8 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
             <h3 className="text-xl font-black text-white uppercase tracking-tighter">
               Access Control
             </h3>
-            <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest mt-1">
-              Configure Memorandum Permissions
+            <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest mt-1 font-['Outfit']">
+              Configure Note Permissions
             </p>
           </div>
           <button
@@ -127,7 +163,12 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className={`p-2.5 rounded-xl ${note.isPublic ? "bg-emerald-500/10 text-emerald-500" : "bg-stone-800 text-stone-500"}`}
+                  className={cn(
+                    "p-2.5 rounded-xl transition-all",
+                    note.isPublic
+                      ? "bg-emerald-500/10 text-emerald-500"
+                      : "bg-stone-800 text-stone-500",
+                  )}
                 >
                   {note.isPublic ? <Globe size={18} /> : <Lock size={18} />}
                 </div>
@@ -138,37 +179,42 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
                     {note.isPublic
                       ? "Anyone with the link can view"
-                      : "Only restricted to authorized users"}
+                      : note.permissions?.length > 0
+                        ? "Shared with authorized personnel"
+                        : "Only restricted to authorized users"}
                   </p>
                 </div>
               </div>
               <button
                 onClick={handleTogglePublic}
-                className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${
+                className={cn(
+                  "px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all font-['Outfit']",
                   note.isPublic
                     ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-                    : "bg-stone-800 text-stone-400 hover:bg-stone-700"
-                }`}
+                    : "bg-stone-800 text-stone-400 hover:bg-stone-700",
+                )}
               >
                 {note.isPublic ? "Disable" : "Enable"}
               </button>
             </div>
 
-            {note.isPublic && (
+            {(note.isPublic || note.permissions?.length > 0) && (
               <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
-                <div className="flex items-center justify-between p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
-                  <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">
-                    Public Access Level
-                  </span>
-                  <select
-                    value={note.publicRole}
-                    onChange={(e) => handleUpdatePublicRole(e.target.value)}
-                    className="bg-[#0c0a09] border border-stone-800 rounded-lg px-2 py-1 text-[9px] font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-emerald-500 text-white"
-                  >
-                    <option value="VIEWER">Read Only</option>
-                    <option value="EDITOR">Edit Access</option>
-                  </select>
-                </div>
+                {note.isPublic && (
+                  <div className="flex items-center justify-between p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
+                    <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">
+                      Public Access Level
+                    </span>
+                    <select
+                      value={note.publicRole}
+                      onChange={(e) => handleUpdatePublicRole(e.target.value)}
+                      className="bg-[#0c0a09] border border-stone-800 rounded-lg px-2 py-1 text-[9px] font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-emerald-500 text-white"
+                    >
+                      <option value="VIEWER">Read Only</option>
+                      <option value="EDITOR">Edit Access</option>
+                    </select>
+                  </div>
+                )}
 
                 <div className="flex gap-2 p-2 bg-[#0c0a09] border border-stone-800 rounded-xl items-center">
                   <div className="flex-1 truncate pl-2 text-[10px] font-mono text-stone-500 uppercase tracking-tighter">
@@ -276,20 +322,21 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div
-                      className={`flex items-center gap-2 px-3 py-1 rounded-lg border text-[8px] font-black uppercase tracking-[0.2em] ${
+                    <select
+                      value={perm.role}
+                      onChange={(e) =>
+                        handleUpdatePermission(perm.user.email, e.target.value)
+                      }
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-1 rounded-lg border text-[8px] font-black uppercase tracking-[0.2em] outline-none transition-all cursor-pointer font-['Outfit']",
                         perm.role === "EDITOR"
-                          ? "bg-[#a81c1c]/10 border-[#a81c1c]/20 text-[#a81c1c]"
-                          : "bg-stone-900 border-stone-800 text-stone-500"
-                      }`}
-                    >
-                      {perm.role === "EDITOR" ? (
-                        <ShieldCheck size={10} />
-                      ) : (
-                        <Shield size={10} />
+                          ? "bg-[#a81c1c]/10 border-[#a81c1c]/20 text-[#a81c1c] focus:ring-1 focus:ring-[#a81c1c]"
+                          : "bg-stone-900 border-stone-800 text-stone-500 focus:ring-1 focus:ring-stone-600",
                       )}
-                      {perm.role}
-                    </div>
+                    >
+                      <option value="VIEWER">Viewer</option>
+                      <option value="EDITOR">Editor</option>
+                    </select>
                     <button
                       onClick={() => handleRemovePermission(perm.userId)}
                       className="p-2 text-stone-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"

@@ -35,7 +35,7 @@ model Permission {
   noteId String
   role   Role   @default(VIEWER)
   user   User   @relation(fields: [userId], references: [id])
-  note   Note   @relation(fields: [noteId], references: [id])
+  note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
 
   @@unique([userId, noteId])
 }

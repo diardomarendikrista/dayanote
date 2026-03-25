@@ -18,6 +18,7 @@ import {
   Link,
   Settings,
 } from "lucide-react";
+import { cn } from "../utils/cn";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
 
@@ -45,15 +46,82 @@ const Dashboard = () => {
       // toast.info(`Document synced to cloud.`);
     });
 
+    socket.on("title_updated", ({ noteId, title }) => {
+      setNotes((prev) =>
+        prev.map((n) => (n.id === noteId ? { ...n, title } : n)),
+      );
+    });
+
+    socket.on("access_revoked", ({ noteId }) => {
+      setNotes((prev) => prev.filter((n) => n.id !== noteId));
+      if (activeNoteId === noteId) {
+        setActiveNoteId(null);
+        toast.info("Access to this memorandum has been revoked.", {
+          duration: 5000,
+        });
+      }
+    });
+
+    socket.on("note_deleted", ({ noteId }) => {
+      setNotes((prev) => prev.filter((n) => n.id !== noteId));
+      if (activeNoteId === noteId) {
+        setActiveNoteId(null);
+        toast.info("This memorandum has been discarded by the owner.");
+      }
+    });
+
+    socket.on("access_changed", ({ noteId, role }) => {
+      const exists = notes.some((n) => n.id === noteId);
+      if (!exists) {
+        fetchNotes(); // New note shared, refresh list
+      } else {
+        setNotes((prev) =>
+          prev.map((n) => (n.id === noteId ? { ...n, role } : n)),
+        );
+      }
+
+      if (activeNoteId === noteId) {
+        toast.info(`Your access role has been updated to ${role}`);
+      }
+    });
+
+    socket.on("note_updated", (updatedNote) => {
+      setNotes((prev) =>
+        prev.map((n) =>
+          n.id === updatedNote.id ? { ...n, ...updatedNote } : n,
+        ),
+      );
+    });
+
+    socket.on("check_access", async ({ noteId }) => {
+      if (activeNoteId === noteId) {
+        try {
+          const res = await axios.get(`${API_URL}/api/notes/${noteId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setNotes((prev) =>
+            prev.map((n) => (n.id === noteId ? { ...n, ...res.data } : n)),
+          );
+        } catch (err) {
+          if (err.response?.status === 403) {
+            setNotes((prev) => prev.filter((n) => n.id !== noteId));
+            setActiveNoteId(null);
+            toast.error("You no longer have access to this document.");
+          }
+        }
+      }
+    });
+
     return () => socket.disconnect();
   }, [token]);
 
-  // Join socket room whenever active note changes
+  // Sync socket rooms with available notes to ensure real-time sidebar updates
   useEffect(() => {
-    if (activeNoteId && socketRef.current) {
-      socketRef.current.emit("join_note", activeNoteId);
+    if (notes.length > 0 && socketRef.current) {
+      const noteIds = notes.map((n) => n.id);
+      socketRef.current.emit("join_note", noteIds);
     }
-  }, [activeNoteId]);
+  }, [notes, token]); // Re-join if notes list changes
 
   // === Notes CRUD ===
   const fetchNotes = async () => {
@@ -75,26 +143,26 @@ const Dashboard = () => {
     try {
       const res = await axios.post(
         `${API_URL}/api/notes`,
-        { title: "New Memorandum" },
+        { title: "New Note" },
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setNotes([res.data, ...notes]);
       setActiveNoteId(res.data.id);
-      toast.success("New memorandum created.");
+      toast.success("New note created.");
     } catch (err) {
       toast.error("Failed to create note.");
     }
   };
 
   const deleteNote = async (id) => {
-    if (!confirm("Discard this memorandum permanently?")) return;
+    if (!confirm("Delete this note permanently?")) return;
     try {
       await axios.delete(`${API_URL}/api/notes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotes(notes.filter((n) => n.id !== id));
       if (activeNoteId === id) setActiveNoteId(null);
-      toast.success("Memorandum discarded.");
+      toast.success("Note deleted.");
     } catch (err) {
       toast.error("Failed to delete note.");
     }
@@ -137,6 +205,14 @@ const Dashboard = () => {
     setNotes(
       notes.map((n) => (n.id === activeNoteId ? { ...n, title: newTitle } : n)),
     );
+
+    // Broadcast in real-time via Socket.io
+    if (socketRef.current) {
+      socketRef.current.emit("update_title", {
+        noteId: activeNoteId,
+        title: newTitle,
+      });
+    }
   };
 
   const handleTitleBlur = (e) => {
@@ -163,7 +239,7 @@ const Dashboard = () => {
       {/* Sidebar */}
       <div className="w-80 bg-[#12100f] border-r border-stone-800/80 flex flex-col relative z-20">
         <div className="p-10 flex items-center justify-between">
-          <h2 className="text-xl font-black tracking-tighter text-white">
+          <h2 className="text-xl font-black tracking-tighter text-white font-['Outfit']">
             DAYA<span className="text-[#a81c1c]">NOTE</span>
           </h2>
           <button
@@ -182,16 +258,16 @@ const Dashboard = () => {
             />
             <input
               type="text"
-              placeholder="Query documents..."
+              placeholder="Search notes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-[#1c1917] border border-stone-800 rounded-xl text-xs font-semibold focus:ring-1 focus:ring-[#a81c1c] outline-none transition-all placeholder:text-stone-700 text-stone-200 shadow-inner tracking-widest uppercase"
+              className="w-full pl-10 pr-4 py-3 bg-[#1c1917] border border-stone-800 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-[#a81c1c] outline-none transition-all placeholder:text-stone-700 text-stone-200 shadow-inner tracking-tight font-['Outfit']"
             />
           </div>
         </div>
 
-        <div className="px-8 mb-6 text-[10px] font-black uppercase tracking-[0.2em] text-[#a81c1c]">
-          Main Directory
+        <div className="px-8 mb-6 text-xs font-black uppercase tracking-[0.2em] text-[#a81c1c] font-['Outfit']">
+          My Notes
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-2 custom-scrollbar">
@@ -202,39 +278,53 @@ const Dashboard = () => {
             <div className="p-2 rounded-lg bg-stone-800 group-hover:bg-[#a81c1c] transition-all">
               <Plus size={16} />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-              Initiate Entry
+            <span className="text-xs font-black uppercase tracking-[0.2em] font-['Outfit']">
+              New Note
             </span>
           </button>
 
           {filteredNotes.map((note) => (
             <div
               key={note.id}
-              className={`group flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all border ${
+              className={cn(
+                "group flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all border",
                 activeNoteId === note.id
                   ? "bg-[#a81c1c] border-[#a81c1c] text-white shadow-xl shadow-[#a81c1c]/20"
-                  : "bg-stone-900/40 border-stone-800 hover:border-stone-600 text-stone-400 hover:text-stone-100"
-              }`}
+                  : "bg-stone-900/40 border-stone-800 hover:border-stone-600 text-stone-400 hover:text-stone-100",
+              )}
               onClick={() => setActiveNoteId(note.id)}
             >
               <div className="flex items-center gap-3 overflow-hidden">
                 <FileText
                   size={16}
-                  className={
+                  className={cn(
+                    "transition-colors",
                     activeNoteId === note.id
                       ? "text-white"
-                      : "text-stone-500 group-hover:text-[#a81c1c]"
-                  }
+                      : "text-stone-500 group-hover:text-[#a81c1c]",
+                  )}
                 />
                 <div className="flex flex-col overflow-hidden">
-                  <span className="truncate text-[10px] font-black uppercase tracking-widest">
-                    {note.title || "Untitled"}
+                  <span className="truncate text-sm font-black uppercase tracking-tight font-['Outfit']">
+                    {note.title || "Untitled Note"}
                   </span>
                   <span
-                    className={`text-[8px] uppercase tracking-tighter font-bold ${activeNoteId === note.id ? "text-red-200" : "text-stone-600"}`}
+                    className={cn(
+                      "text-[10px] uppercase tracking-wider font-bold",
+                      activeNoteId === note.id
+                        ? "text-red-200"
+                        : "text-stone-600",
+                    )}
                   >
-                    {note.isPublic ? "🌐 Public" : "🔒 Private"} · ID:{" "}
-                    {note.id.substring(0, 8)}
+                    {!note.isPublic &&
+                    (note._count?.permissions > 0 ||
+                      note.permissions?.length > 0 ||
+                      note.ownerId !== user.id)
+                      ? "🔒 Shared"
+                      : note.isPublic
+                        ? "🌐 Public"
+                        : "🔒 Private"}{" "}
+                    · ID: {note.id.substring(0, 8)}
                   </span>
                 </div>
               </div>
@@ -249,10 +339,10 @@ const Dashboard = () => {
                 {user?.name?.charAt(0)}
               </div>
               <div className="flex flex-col overflow-hidden">
-                <span className="text-[10px] font-black truncate text-white uppercase tracking-widest">
+                <span className="text-xs font-black truncate text-white uppercase tracking-widest font-['Outfit']">
                   {user?.name}
                 </span>
-                <span className="text-[8px] text-stone-500 truncate uppercase tracking-tighter font-bold">
+                <span className="text-[10px] text-stone-500 truncate uppercase tracking-tight font-bold">
                   Authorized User
                 </span>
               </div>
@@ -282,8 +372,8 @@ const Dashboard = () => {
                   onFocus={handleTitleFocus}
                   onBlur={handleTitleBlur}
                   disabled={!canEdit}
-                  className="text-2xl font-black bg-transparent outline-none border-none focus:ring-0 w-full placeholder:text-stone-800 uppercase tracking-tighter text-white min-w-0 disabled:opacity-50"
-                  placeholder="Document Identifier"
+                  className="text-2xl font-black bg-transparent outline-none border-none focus:ring-0 w-full placeholder:text-stone-800 uppercase tracking-tighter text-white min-w-0 disabled:opacity-50 font-['Outfit']"
+                  placeholder="Note Title"
                 />
               </div>
 
@@ -312,9 +402,11 @@ const Dashboard = () => {
                 {activeNote?.role === "OWNER" ? (
                   <button
                     onClick={() => setIsSettingsOpen(true)}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[#a81c1c]/10 border border-[#a81c1c]/30 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-[#a81c1c] hover:bg-[#a81c1c] hover:text-white transition-all shadow-lg"
+                    className={cn(
+                      "flex items-center gap-2 px-6 py-2.5 bg-[#a81c1c]/10 border border-[#a81c1c]/30 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-[#a81c1c] hover:bg-[#a81c1c] hover:text-white transition-all shadow-lg font-['Outfit']",
+                    )}
                   >
-                    <Share2 size={13} /> Manage Access
+                    <Share2 size={13} /> Share Note
                   </button>
                 ) : (
                   <button
@@ -369,18 +461,19 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="space-y-4 max-w-sm">
-              <h3 className="text-3xl font-black text-white uppercase tracking-tighter">
-                System Idle
+              <h3 className="text-3xl font-black text-white uppercase tracking-tighter font-['Outfit']">
+                No Note Selected
               </h3>
-              <p className="text-stone-500 text-[10px] font-black leading-relaxed uppercase tracking-[0.2em]">
-                Awaiting command. Select a memorandum or initiate a new entry.
+              <p className="text-stone-500 text-[10px] font-black leading-relaxed uppercase tracking-[0.2em] font-['Outfit']">
+                Select a note from the sidebar or create a new one to start
+                writing.
               </p>
             </div>
             <button
               onClick={createNote}
-              className="px-10 py-5 bg-[#a81c1c] hover:bg-[#991b1b] text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all active:scale-95 shadow-2xl shadow-[#a81c1c]/40"
+              className="px-10 py-5 bg-[#a81c1c] hover:bg-[#991b1b] text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all active:scale-95 shadow-2xl shadow-[#a81c1c]/40 font-['Outfit']"
             >
-              Initiate New Entry
+              Create New Note
             </button>
           </div>
         )}

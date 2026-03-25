@@ -37,7 +37,7 @@ Authenticates a user.
 Returns all notes owned by or shared with the user.
 
 - **Auth**: Required
-- **Response**: `Array<{ id, title, isPublic, publicRole, role, ... }>`
+- **Response**: `Array<{ id, title, isPublic, publicRole, role, _count: { permissions }, ... }>`
 
 #### `POST /api/notes`
 
@@ -52,7 +52,7 @@ Creates a new note.
 Fetch a specific note. Accessible if owner, collaborator, or if the note is public.
 
 - **Auth**: Optional
-- **Response**: `{ id, title, content, isPublic, publicRole, role, owner, permissions }`
+- **Response**: `{ id, title, content, isPublic, publicRole, role, owner, permissions, _count: { permissions } }`
 
 #### `PUT /api/notes/:id`
 
@@ -82,7 +82,7 @@ Remove a collaborator's access.
 ## 🔄 Real-time (WebSocket)
 
 - **Hocuspocus**: Connect to `ws://localhost:4015` with `token` and `documentName`. Handles Yjs document synchronization and authorization.
-- **Socket.io**: Used for global UI events (e.g., `document_saved`).
+- **Socket.io**: Used for real-time UI events (e.g., `check_access`, `note_deleted`, `title_updated`). Uses room-based broadcast (`note_{id}` and `user_{id}`).
 
 ## 🧪 Testing
 

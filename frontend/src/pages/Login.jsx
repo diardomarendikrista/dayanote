@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
+import { cn } from "../utils/cn";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -48,7 +49,7 @@ const Login = () => {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-3">
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl text-[11px] font-bold uppercase tracking-wider flex items-center gap-3 font-['Outfit']">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0"></span>
             {error}
           </div>
@@ -59,7 +60,7 @@ const Login = () => {
           className="space-y-6"
         >
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">
+            <label className="text-[11px] font-black uppercase tracking-widest text-stone-400 ml-1 font-['Outfit']">
               Email Identification
             </label>
             <input
@@ -72,7 +73,7 @@ const Login = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-1">
+            <label className="text-[11px] font-black uppercase tracking-widest text-stone-400 ml-1 font-['Outfit']">
               Secure Access
             </label>
             <input
@@ -92,19 +93,19 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="mt-10 text-center text-[10px] font-black uppercase tracking-[0.2em] text-stone-600">
+        <p className="mt-10 text-center text-[11px] font-black uppercase tracking-[0.2em] text-stone-600 font-['Outfit']">
           New to the system?{" "}
           <Link
             to="/register"
             className="text-[#a81c1c] hover:text-white transition-colors ml-1"
           >
-            Initialize Account
+            Create Account
           </Link>
         </p>
       </div>
 
-      <div className="absolute bottom-8 text-center w-full">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-800">
+      <div className="absolute bottom-8 text-center w-full px-4">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-800 font-['Outfit']">
           Daya Lima Enterprise Ecosystem
         </p>
       </div>

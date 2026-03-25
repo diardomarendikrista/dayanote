@@ -6,14 +6,31 @@ const createHocuspocusServer = require('./config/hocuspocus');
 
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
+app.set('io', io);
 
 // Inisialisasi Hocuspocus dengan io
 const hocuspocusServer = createHocuspocusServer(io);
 
+const jwt = require('jsonwebtoken');
+
 // Socket.io logic
 io.on('connection', (socket) => {
-  socket.on('join_note', (noteId) => {
-    socket.join(`note_${noteId}`);
+  // Join user's personal room for targeted notifications
+  const token = socket.handshake.auth?.token;
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      socket.join(`user_${decoded.id}`);
+    } catch (e) { }
+  }
+
+  socket.on('join_note', (noteIds) => {
+    const ids = Array.isArray(noteIds) ? noteIds : [noteIds];
+    ids.forEach(id => socket.join(`note_${id}`));
+  });
+
+  socket.on('update_title', ({ noteId, title }) => {
+    socket.to(`note_${noteId}`).emit('title_updated', { noteId, title });
   });
 });
 
