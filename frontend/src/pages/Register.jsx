@@ -24,22 +24,28 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0c0a09] p-4 relative overflow-hidden font-['Inter']">
+    <div className={cn(
+      "min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden font-['Inter']",
+    )}>
       {/* Background Orbs with Brand Colors */}
-      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#a81c1c]/10 rounded-full blur-[150px] animate-pulse"></div>
-      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#a81c1c]/5 rounded-full blur-[150px] animate-pulse delay-1000"></div>
+      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-primary/10 rounded-full blur-[150px] animate-pulse"></div>
+      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-brand-primary/5 rounded-full blur-[150px] animate-pulse delay-1000"></div>
 
-      <div className="w-full max-w-md p-12 glass rounded-[2.5rem] shadow-2xl relative z-10 border border-white/5">
+      <div className={cn(
+        "w-full max-w-md p-12 glass rounded-[2.5rem] shadow-2xl relative z-10 border border-border/50",
+      )}>
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-[#a81c1c] rounded-2xl rotate-45 flex items-center justify-center shadow-2xl shadow-[#a81c1c]/20">
+            <div className={cn(
+              "w-16 h-16 bg-brand-primary rounded-2xl rotate-45 flex items-center justify-center shadow-2xl shadow-brand-primary/20",
+            )}>
               <span className="text-white text-3xl font-black -rotate-45">
                 D
               </span>
             </div>
           </div>
-          <h1 className="text-4xl font-black mb-2 tracking-tighter text-white">
-            DAYA<span className="text-[#a81c1c]">NOTE</span>
+          <h1 className="text-4xl font-black mb-2 tracking-tighter text-foreground">
+            DAYA<span className="text-brand-primary">NOTE</span>
           </h1>
           <p className="text-stone-500 font-medium text-sm tracking-widest uppercase">
             Start your collaborative journey
@@ -98,7 +104,11 @@ const Register = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-4 bg-[#a81c1c] hover:bg-[#991b1b] text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-[#a81c1c]/30 active:scale-[0.98] transition-all mt-4"
+            className={cn(
+              "w-full py-4 bg-brand-primary hover:bg-brand-hover text-white rounded-2xl font-black",
+              "text-xs uppercase tracking-[0.2em] shadow-2xl shadow-brand-primary/30",
+              "active:scale-[0.98] transition-all mt-4 cursor-pointer",
+            )}
           >
             Create Account
           </button>
@@ -108,7 +118,7 @@ const Register = () => {
           Already have an account?{" "}
           <Link
             to="/login"
-            className="text-[#a81c1c] hover:text-white transition-colors ml-1"
+            className="text-brand-primary hover:text-foreground transition-colors ml-1"
           >
             Sign in
           </Link>

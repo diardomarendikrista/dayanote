@@ -137,21 +137,26 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-sm bg-black/60 font-['Inter']">
-      <div className="bg-[#12100f] border border-stone-800 w-full max-w-lg rounded-[2.5rem] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+    <div className={cn("fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-sm bg-black/60 font-['Inter']")}>
+      <div className={cn(
+        "bg-card border border-border w-full max-w-lg rounded-[2.5rem] overflow-hidden",
+        "shadow-2xl animate-in fade-in zoom-in duration-300",
+      )}>
         {/* Header */}
-        <div className="p-8 border-b border-stone-800/50 flex items-center justify-between bg-[#161412]">
+        <div className={cn("p-8 border-b border-border/50 flex items-center justify-between bg-muted/30")}>
           <div>
-            <h3 className="text-xl font-black text-white uppercase tracking-tighter">
+            <h3 className="text-xl font-black text-foreground uppercase tracking-tighter">
               Access Control
             </h3>
-            <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest mt-1 font-['Outfit']">
+            <p className={cn(
+              "text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1 font-['Outfit']",
+            )}>
               Configure Note Permissions
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-stone-500 hover:text-white transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -167,16 +172,18 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                     "p-2.5 rounded-xl transition-all",
                     note.isPublic
                       ? "bg-emerald-500/10 text-emerald-500"
-                      : "bg-stone-800 text-stone-500",
+                      : "bg-muted text-muted-foreground",
                   )}
                 >
                   {note.isPublic ? <Globe size={18} /> : <Lock size={18} />}
                 </div>
                 <div>
-                  <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                  <h4 className="text-sm font-black text-foreground uppercase tracking-tight">
                     Public Access
                   </h4>
-                  <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+                  <p className={cn(
+                    "text-[10px] text-muted-foreground font-bold uppercase tracking-widest",
+                  )}>
                     {note.isPublic
                       ? "Anyone with the link can view"
                       : note.permissions?.length > 0
@@ -188,10 +195,10 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
               <button
                 onClick={handleTogglePublic}
                 className={cn(
-                  "px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all font-['Outfit']",
+                  "px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all font-['Outfit'] cursor-pointer",
                   note.isPublic
                     ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-                    : "bg-stone-800 text-stone-400 hover:bg-stone-700",
+                    : "bg-muted text-muted-foreground hover:bg-muted/80",
                 )}
               >
                 {note.isPublic ? "Disable" : "Enable"}
@@ -208,7 +215,10 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                     <select
                       value={note.publicRole}
                       onChange={(e) => handleUpdatePublicRole(e.target.value)}
-                      className="bg-[#0c0a09] border border-stone-800 rounded-lg px-2 py-1 text-[9px] font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-emerald-500 text-white"
+                      className={cn(
+                        "bg-input border border-border rounded-lg px-2 py-1 text-[9px]",
+                        "font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-emerald-500 text-foreground cursor-pointer",
+                      )}
                     >
                       <option value="VIEWER">Read Only</option>
                       <option value="EDITOR">Edit Access</option>
@@ -216,13 +226,13 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                   </div>
                 )}
 
-                <div className="flex gap-2 p-2 bg-[#0c0a09] border border-stone-800 rounded-xl items-center">
-                  <div className="flex-1 truncate pl-2 text-[10px] font-mono text-stone-500 uppercase tracking-tighter">
+                <div className="flex gap-2 p-2 bg-input border border-border rounded-xl items-center">
+                  <div className="flex-1 truncate pl-2 text-[10px] font-mono text-muted-foreground uppercase tracking-tighter">
                     {window.location.origin}/note/{note.id}
                   </div>
                   <button
                     onClick={copyLink}
-                    className="p-2 bg-stone-800 hover:bg-[#a81c1c] text-stone-400 hover:text-white rounded-lg transition-all"
+                    className="p-2 bg-muted hover:bg-brand-primary text-muted-foreground hover:text-white rounded-lg transition-all cursor-pointer"
                   >
                     {copied ? <Check size={14} /> : <Copy size={14} />}
                   </button>
@@ -235,7 +245,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
 
           {/* Add Collaborator Section */}
           <div className="space-y-4">
-            <h4 className="text-[10px] font-black text-[#a81c1c] uppercase tracking-[0.2em]">
+            <h4 className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">
               Add Authorized User
             </h4>
             <form
@@ -252,20 +262,27 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                   placeholder="USER@DOMAIN.COM"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-[#0c0a09] border border-stone-800 rounded-xl text-xs font-bold focus:ring-1 focus:ring-[#a81c1c] outline-none transition-all placeholder:text-stone-700 uppercase tracking-widest"
+                  className={cn(
+                    "w-full pl-10 pr-4 py-3 bg-input border border-border rounded-xl text-xs font-bold",
+                    "focus:ring-1 focus:ring-brand-primary outline-none transition-all",
+                    "placeholder:text-muted-foreground/50 uppercase tracking-widest text-foreground",
+                  )}
                 />
               </div>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="bg-[#0c0a09] border border-stone-800 rounded-xl px-3 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-[#a81c1c]"
+                className={cn(
+                  "bg-input border border-border rounded-xl px-3 text-[10px]",
+                  "font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-brand-primary text-foreground cursor-pointer",
+                )}
               >
                 <option value="VIEWER">Viewer</option>
                 <option value="EDITOR">Editor</option>
               </select>
               <button
                 disabled={loading || !email}
-                className="p-3 bg-stone-800 hover:bg-[#a81c1c] text-stone-400 hover:text-white rounded-xl transition-all disabled:opacity-30"
+                className="p-3 bg-muted hover:bg-brand-primary text-muted-foreground hover:text-white rounded-xl transition-all disabled:opacity-30 cursor-pointer"
               >
                 <UserPlus size={18} />
               </button>
@@ -274,29 +291,35 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
 
           {/* Collaborator List */}
           <div className="space-y-4">
-            <h4 className="text-[10px] font-black text-[#a81c1c] uppercase tracking-[0.2em]">
+            <h4 className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em]">
               Authorized Personnel
             </h4>
             <div className="space-y-2">
               {/* Owner */}
-              <div className="flex items-center justify-between p-4 bg-[#161412] border border-stone-800/50 rounded-2xl">
+              <div className={cn(
+                "flex items-center justify-between p-4 bg-muted/20 border border-border/50 rounded-2xl",
+              )}>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#a81c1c] flex items-center justify-center text-white text-[10px] font-black uppercase tracking-tighter shadow-lg shadow-[#a81c1c]/20">
+                  <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-white text-[10px] font-black uppercase tracking-tighter shadow-lg shadow-brand-primary/20">
                     {note.owner?.name?.charAt(0)}
                   </div>
                   <div>
-                    <h5 className="text-[10px] font-black text-white uppercase tracking-widest">
+                    <h5 className={cn(
+                      "text-[10px] font-black text-foreground uppercase tracking-widest",
+                    )}>
                       {note.owner?.name} (You)
                     </h5>
-                    <p className="text-[8px] text-stone-600 font-bold uppercase tracking-widest">
+                    <p className={cn(
+                      "text-[8px] text-muted-foreground font-bold uppercase tracking-widest",
+                    )}>
                       {note.owner?.email}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5 text-[8px] font-black text-white uppercase tracking-[0.2em]">
+                <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-lg border border-border text-[8px] font-black text-foreground uppercase tracking-[0.2em]">
                   <ShieldCheck
                     size={10}
-                    className="text-[#a81c1c]"
+                    className="text-brand-primary"
                   />{" "}
                   Owner
                 </div>
@@ -306,17 +329,27 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
               {note.permissions?.map((perm) => (
                 <div
                   key={perm.id}
-                  className="flex items-center justify-between p-4 bg-[#0c0a09] border border-stone-800/50 rounded-2xl group hover:border-[#a81c1c]/30 transition-all"
+                  className={cn(
+                    "flex items-center justify-between p-4 bg-input/50 border border-border/50",
+                    "rounded-2xl group hover:border-brand-primary/30 transition-all",
+                  )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-stone-800 flex items-center justify-center text-stone-400 text-[10px] font-black uppercase tracking-tighter">
+                    <div className={cn(
+                      "w-8 h-8 rounded-lg bg-muted flex items-center justify-center",
+                      "text-muted-foreground text-[10px] font-black uppercase tracking-tighter",
+                    )}>
                       {perm.user.name?.charAt(0)}
                     </div>
                     <div>
-                      <h5 className="text-[10px] font-black text-white uppercase tracking-widest">
+                      <h5 className={cn(
+                        "text-[10px] font-black text-foreground uppercase tracking-widest",
+                      )}>
                         {perm.user.name}
                       </h5>
-                      <p className="text-[8px] text-stone-600 font-bold uppercase tracking-widest">
+                      <p className={cn(
+                        "text-[8px] text-muted-foreground font-bold uppercase tracking-widest",
+                      )}>
                         {perm.user.email}
                       </p>
                     </div>
@@ -330,8 +363,8 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                       className={cn(
                         "flex items-center gap-2 px-3 py-1 rounded-lg border text-[8px] font-black uppercase tracking-[0.2em] outline-none transition-all cursor-pointer font-['Outfit']",
                         perm.role === "EDITOR"
-                          ? "bg-[#a81c1c]/10 border-[#a81c1c]/20 text-[#a81c1c] focus:ring-1 focus:ring-[#a81c1c]"
-                          : "bg-stone-900 border-stone-800 text-stone-500 focus:ring-1 focus:ring-stone-600",
+                          ? "bg-brand-primary/10 border-brand-primary/20 text-brand-primary focus:ring-1 focus:ring-brand-primary"
+                          : "bg-muted border-border text-muted-foreground focus:ring-1 focus:ring-border",
                       )}
                     >
                       <option value="VIEWER">Viewer</option>
@@ -339,7 +372,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                     </select>
                     <button
                       onClick={() => handleRemovePermission(perm.userId)}
-                      className="p-2 text-stone-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                      className="p-2 text-stone-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -351,10 +384,13 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-8 border-t border-stone-800/50 bg-[#161412] flex justify-end">
+        <div className="p-8 border-t border-border flex justify-end bg-muted/10">
           <button
             onClick={onClose}
-            className="px-8 py-3 bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+            className={cn(
+              "px-8 py-3 bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground",
+              "rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border border-border cursor-pointer",
+            )}
           >
             Closed
           </button>

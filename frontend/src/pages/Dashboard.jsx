@@ -13,10 +13,7 @@ import {
   Trash2,
   Sun,
   Moon,
-  Search,
   Check,
-  Link,
-  Settings,
 } from "lucide-react";
 import { cn } from "../utils/cn";
 
@@ -235,35 +232,40 @@ const Dashboard = () => {
   const canEdit = activeNote?.role === "OWNER" || activeNote?.role === "EDITOR";
 
   return (
-    <div className="flex h-screen bg-[#0c0a09] overflow-hidden text-stone-200 font-['Inter']">
+    <div className="flex h-screen bg-background overflow-hidden text-foreground font-['Inter']">
       {/* Sidebar */}
-      <div className="w-80 bg-[#12100f] border-r border-stone-800/80 flex flex-col relative z-20">
+      <div className="w-80 bg-sidebar border-r border-border flex flex-col relative z-20">
         <div className="p-10 flex items-center justify-between">
-          <h2 className="text-xl font-black tracking-tighter text-white font-['Outfit']">
-            DAYA<span className="text-[#a81c1c]">NOTE</span>
+          <h2
+            className={cn(
+              "text-2xl font-black tracking-tighter font-['Outfit'] text-foreground",
+            )}
+          >
+            DAYA<span className="text-brand-primary">NOTE</span>
           </h2>
           <button
             onClick={toggleTheme}
-            className="w-8 h-8 rounded-lg bg-stone-800/50 hover:bg-stone-700 flex items-center justify-center transition-colors shadow-lg"
+            className={cn(
+              "w-8 h-8 rounded-lg bg-muted/50 hover:bg-muted flex items-center justify-center",
+              "transition-colors shadow-lg border border-border cursor-pointer",
+            )}
           >
             {theme === "light" ? <Moon size={14} /> : <Sun size={14} />}
           </button>
         </div>
 
         <div className="px-8 mb-8">
-          <div className="relative group">
-            <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 group-focus-within:text-[#a81c1c] transition-colors"
-              size={14}
-            />
-            <input
-              type="text"
-              placeholder="Search notes..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-[#1c1917] border border-stone-800 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-[#a81c1c] outline-none transition-all placeholder:text-stone-700 text-stone-200 shadow-inner tracking-tight font-['Outfit']"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Search notes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={cn(
+              "w-full pl-10 pr-4 py-3 bg-input border border-border rounded-xl",
+              "text-sm font-semibold focus:ring-1 focus:ring-brand-primary outline-none transition-all",
+              "placeholder:text-muted-foreground text-foreground shadow-inner tracking-tight font-['Outfit']",
+            )}
+          />
         </div>
 
         <div className="px-8 mb-6 text-xs font-black uppercase tracking-[0.2em] text-[#a81c1c] font-['Outfit']">
@@ -273,9 +275,12 @@ const Dashboard = () => {
         <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-2 custom-scrollbar">
           <button
             onClick={createNote}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-stone-300 hover:text-white hover:bg-stone-800/50 rounded-xl transition-all group mb-4"
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3.5",
+              "text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-all group mb-4 cursor-pointer",
+            )}
           >
-            <div className="p-2 rounded-lg bg-stone-800 group-hover:bg-[#a81c1c] transition-all">
+            <div className="p-2 rounded-lg bg-muted group-hover:bg-brand-primary group-hover:text-white transition-all text-muted-foreground">
               <Plus size={16} />
             </div>
             <span className="text-xs font-black uppercase tracking-[0.2em] font-['Outfit']">
@@ -289,8 +294,8 @@ const Dashboard = () => {
               className={cn(
                 "group flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all border",
                 activeNoteId === note.id
-                  ? "bg-[#a81c1c] border-[#a81c1c] text-white shadow-xl shadow-[#a81c1c]/20"
-                  : "bg-stone-900/40 border-stone-800 hover:border-stone-600 text-stone-400 hover:text-stone-100",
+                  ? "bg-brand-primary border-brand-primary text-white shadow-xl shadow-brand-primary/20"
+                  : "bg-muted/30 border-border hover:border-brand-primary/30 text-muted-foreground hover:text-foreground",
               )}
               onClick={() => setActiveNoteId(note.id)}
             >
@@ -301,7 +306,7 @@ const Dashboard = () => {
                     "transition-colors",
                     activeNoteId === note.id
                       ? "text-white"
-                      : "text-stone-500 group-hover:text-[#a81c1c]",
+                      : "text-muted-foreground group-hover:text-brand-primary",
                   )}
                 />
                 <div className="flex flex-col overflow-hidden">
@@ -312,8 +317,8 @@ const Dashboard = () => {
                     className={cn(
                       "text-[10px] uppercase tracking-wider font-bold",
                       activeNoteId === note.id
-                        ? "text-red-200"
-                        : "text-stone-600",
+                        ? "text-red-100"
+                        : "text-muted-foreground/60",
                     )}
                   >
                     {!note.isPublic &&
@@ -332,24 +337,34 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="p-8 border-t border-stone-800/80 bg-[#0c0a09]">
+        <div className="p-8 border-t border-border bg-sidebar mt-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 overflow-hidden">
-              <div className="w-10 h-10 rounded-xl bg-[#a81c1c] flex items-center justify-center text-white font-black shrink-0 shadow-lg shadow-[#a81c1c]/20">
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center",
+                  "text-white font-black shrink-0 shadow-lg shadow-brand-primary/20",
+                )}
+              >
                 {user?.name?.charAt(0)}
               </div>
               <div className="flex flex-col overflow-hidden">
-                <span className="text-xs font-black truncate text-white uppercase tracking-widest font-['Outfit']">
+                <span
+                  className={cn(
+                    "text-xs font-black truncate text-foreground uppercase tracking-widest font-['Outfit']",
+                  )}
+                >
                   {user?.name}
                 </span>
-                <span className="text-[10px] text-stone-500 truncate uppercase tracking-tight font-bold">
+                <span className="text-[10px] text-muted-foreground truncate uppercase tracking-tight font-bold">
                   Authorized User
                 </span>
               </div>
             </div>
             <button
               onClick={logout}
-              className="p-2 text-stone-600 hover:text-red-500 transition-colors"
+              className="p-2 text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
+              title="Logout System"
             >
               <LogOut size={16} />
             </button>
@@ -358,13 +373,13 @@ const Dashboard = () => {
       </div>
 
       {/* Main Area */}
-      <div className="flex-1 flex flex-col relative z-10 bg-[#080706]">
+      <div className="flex-1 flex flex-col relative z-10 bg-background">
         {activeNoteId ? (
           <>
-            <div className="h-24 border-b border-stone-800/80 flex items-center justify-between px-12 bg-[#0c0a09]/50 backdrop-blur-md gap-6">
+            <div className="h-24 border-b border-border flex items-center justify-between px-12 bg-background/50 backdrop-blur-md gap-6">
               {/* Title */}
               <div className="flex items-center gap-4 flex-1 overflow-hidden">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#a81c1c] shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
                 <input
                   type="text"
                   value={activeNote?.title || ""}
@@ -372,7 +387,10 @@ const Dashboard = () => {
                   onFocus={handleTitleFocus}
                   onBlur={handleTitleBlur}
                   disabled={!canEdit}
-                  className="text-2xl font-black bg-transparent outline-none border-none focus:ring-0 w-full placeholder:text-stone-800 uppercase tracking-tighter text-white min-w-0 disabled:opacity-50 font-['Outfit']"
+                  className={cn(
+                    "text-2xl font-black bg-transparent outline-none border-none focus:ring-0 w-full",
+                    "placeholder:text-muted/50 uppercase tracking-tighter text-foreground min-w-0 disabled:opacity-50 font-['Outfit']",
+                  )}
                   placeholder="Note Title"
                 />
               </div>
@@ -403,7 +421,9 @@ const Dashboard = () => {
                   <button
                     onClick={() => setIsSettingsOpen(true)}
                     className={cn(
-                      "flex items-center gap-2 px-6 py-2.5 bg-[#a81c1c]/10 border border-[#a81c1c]/30 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-[#a81c1c] hover:bg-[#a81c1c] hover:text-white transition-all shadow-lg font-['Outfit']",
+                      "flex items-center gap-2 px-6 py-2.5 bg-brand-primary/10 border border-brand-primary/30 rounded-xl",
+                      "text-[9px] font-black uppercase tracking-[0.2em] text-brand-primary hover:bg-brand-primary",
+                      "hover:text-white transition-all shadow-lg font-['Outfit'] cursor-pointer",
                     )}
                   >
                     <Share2 size={13} /> Share Note
@@ -416,7 +436,11 @@ const Dashboard = () => {
                       );
                       toast.success("Link copied!");
                     }}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-stone-900 border border-stone-800 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 hover:text-white transition-all shadow-lg"
+                    className={cn(
+                      "flex items-center gap-2 px-6 py-2.5 bg-stone-900 border border-stone-800 rounded-xl",
+                      "text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 hover:text-white",
+                      "transition-all shadow-lg cursor-pointer",
+                    )}
                   >
                     <Share2 size={13} /> Copy Link
                   </button>
@@ -426,7 +450,10 @@ const Dashboard = () => {
                 {activeNote?.role === "OWNER" && (
                   <button
                     onClick={() => deleteNote(activeNoteId)}
-                    className="p-2.5 rounded-xl bg-stone-900 border border-stone-800 hover:bg-red-500/20 hover:text-red-500 transition-all text-stone-600 ml-2"
+                    className={cn(
+                      "p-2.5 rounded-xl bg-muted border border-border hover:bg-red-500/20 hover:text-red-500",
+                      "transition-all text-muted-foreground ml-2 cursor-pointer",
+                    )}
                   >
                     <Trash2 size={16} />
                   </button>
@@ -455,23 +482,35 @@ const Dashboard = () => {
         ) : (
           <div className="flex-1 flex flex-col justify-center items-center text-center p-12 space-y-10">
             <div className="relative">
-              <div className="absolute inset-0 bg-[#a81c1c]/10 blur-[80px] rounded-full animate-pulse" />
-              <div className="relative w-32 h-32 bg-[#1c1917] border border-stone-800 rounded-[2.5rem] flex items-center justify-center text-[#a81c1c] rotate-6 animate-float shadow-2xl">
+              <div
+                className={cn(
+                  "relative w-32 h-32 bg-card border border-border rounded-[2.5rem]",
+                  "flex items-center justify-center text-brand-primary rotate-6 animate-float shadow-2xl",
+                )}
+              >
                 <FileText size={48} />
               </div>
             </div>
             <div className="space-y-4 max-w-sm">
-              <h3 className="text-3xl font-black text-white uppercase tracking-tighter font-['Outfit']">
+              <h3 className="text-3xl font-black text-foreground uppercase tracking-tighter font-['Outfit']">
                 No Note Selected
               </h3>
-              <p className="text-stone-500 text-[10px] font-black leading-relaxed uppercase tracking-[0.2em] font-['Outfit']">
+              <p
+                className={cn(
+                  "text-stone-500 text-[10px] font-black leading-relaxed uppercase tracking-[0.2em] font-['Outfit']",
+                )}
+              >
                 Select a note from the sidebar or create a new one to start
                 writing.
               </p>
             </div>
             <button
               onClick={createNote}
-              className="px-10 py-5 bg-[#a81c1c] hover:bg-[#991b1b] text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all active:scale-95 shadow-2xl shadow-[#a81c1c]/40 font-['Outfit']"
+              className={cn(
+                "px-10 py-5 bg-brand-primary hover:bg-brand-hover text-white rounded-2xl",
+                "font-black text-[10px] uppercase tracking-[0.3em] transition-all active:scale-95",
+                "shadow-2xl shadow-brand-primary/40 font-['Outfit'] cursor-pointer",
+              )}
             >
               Create New Note
             </button>

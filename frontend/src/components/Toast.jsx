@@ -7,14 +7,14 @@ const ICONS = {
     icon: Check,
     bg: "bg-emerald-500/10",
     border: "border-emerald-500/20",
-    text: "text-emerald-400",
+    text: "text-emerald-600 dark:text-emerald-400",
     dot: "bg-emerald-500",
   },
   error: {
     icon: AlertTriangle,
     bg: "bg-red-500/10",
     border: "border-red-500/20",
-    text: "text-red-400",
+    text: "text-red-600 dark:text-red-400",
     dot: "bg-red-500",
   },
   info: {
