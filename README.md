@@ -2,7 +2,9 @@
 
 DayaNote is a professional, high-performance collaborative note-taking application designed with an industrial "Daya Lima" aesthetic. It features real-time synchronization, granular permissions, and premium typography.
 
-## 🚀 Key Features
+---
+
+## Key Features
 
 - **Real-time Collaboration**: Powered by Yjs and Hocuspocus for sub-millisecond sync.
 - **Advanced Permissions**: Manage collaborators with SPECIFIC roles (OWNER, EDITOR, VIEWER).
@@ -12,7 +14,9 @@ DayaNote is a professional, high-performance collaborative note-taking applicati
 - **Clean Code Architecture**: Systematic use of `cn` utilities and atomic components.
 - **Verified Stability**: Integrated Socket.io for consistent real-time events across the dashboard and public views.
 
-## 🏗️ Project Structure
+---
+
+## Project Structure
 
 ```text
 dayanote/
@@ -30,7 +34,9 @@ dayanote/
     │   └── store/      # State management (Zustand)
 ```
 
-## 🛠️ Quick Start
+---
+
+## Quick Start
 
 ### Prerequisites
 
@@ -42,7 +48,8 @@ dayanote/
 ```bash
 cd backend
 npm install
-# Configure .env with your DATABASE_URL and JWT_SECRET
+# Copy .env.example to .env and configure DATABASE_URL and JWT_SECRET
+cp .env.example .env
 npx prisma db push
 npm run dev
 ```
@@ -55,11 +62,13 @@ npm install
 npm run dev
 ```
 
-## 📜 Documentation
+---
+
+## Documentation
 
 - [Backend Documentation](backend/README.md)
 - [Frontend Documentation](frontend/README.md)
 
 ---
 
-_DayaNote v1.1.0-beta | Premium Collaborative Intelligence_
+_DayaNote v1.2.0 | Premium Collaborative Intelligence_
