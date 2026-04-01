@@ -1,0 +1,36 @@
+name: Deploy DayaNote to Windows Server
+
+on:
+  push:
+    branches:
+      - main # Akan jalan setiap kali ada push ke branch main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22" # Sesuaikan dengan versi Node.js di server
+
+      - name: Deploy Backend
+        run: |
+          cd backend
+          npm install
+          npx prisma generate
+          npx prisma db push --skip-generate
+          pm2 restart dayanote-be
+          pm2 save
+
+      # - name: Deploy Frontend (Build)
+      #   run: |
+      #     cd frontend
+      #     npm install
+      #     npm run build
+      #     # Jika frontend di-serve pakai PM2 juga, tambahkan perintah restart di sini
+      #     # contoh: pm2 restart dayanote-fe

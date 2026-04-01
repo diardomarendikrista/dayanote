@@ -18,8 +18,14 @@ const Login = () => {
         `${import.meta.env.VITE_API_URL || "http://localhost:4015"}/api/auth/login`,
         { email, password },
       );
-      setUser(res.data.user, res.data.token);
-      navigate("/dashboard");
+      const { user, token, needsReset } = res.data;
+      setUser(user, token, needsReset);
+      
+      if (needsReset) {
+        navigate("/reset-password");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.error || "Login failed");
     }

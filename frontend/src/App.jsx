@@ -9,11 +9,12 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotePage from "./pages/NotePage";
+import ResetPassword from "./pages/ResetPassword";
 import ToastContainer from "./components/Toast";
 import { useEffect } from "react";
 
 const ProtectedRoute = ({ children }) => {
-  const { token } = useAppStore();
+  const { token, needsReset } = useAppStore();
   if (!token)
     return (
       <Navigate
@@ -21,6 +22,16 @@ const ProtectedRoute = ({ children }) => {
         replace
       />
     );
+  
+  if (needsReset) {
+    return (
+      <Navigate
+        to="/reset-password"
+        replace
+      />
+    );
+  }
+  
   return children;
 };
 
@@ -41,6 +52,10 @@ function App() {
         <Route
           path="/register"
           element={<Register />}
+        />
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
         />
         <Route
           path="/dashboard"

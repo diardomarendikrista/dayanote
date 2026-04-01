@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAppStore } from "../store/useAppStore";
 import CollaborativeEditor from "../components/CollaborativeEditor";
 import NoteSettingsModal from "../components/NoteSettingsModal";
+import SettingsModal from "../components/SettingsModal";
 import { toast } from "../components/Toast";
 import { io } from "socket.io-client";
 import {
@@ -27,7 +28,8 @@ const Dashboard = () => {
   const [activeNoteId, setActiveNoteId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [saveStatus, setSaveStatus] = useState("idle");
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const titleSaveTimer = useRef(null);
   const socketRef = useRef(null);
@@ -368,7 +370,10 @@ const Dashboard = () => {
 
         <div className="p-8 border-t border-border bg-sidebar mt-auto">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 overflow-hidden">
+            <div 
+              className="flex items-center gap-4 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => setIsUserModalOpen(true)}
+            >
               <div
                 className={cn(
                   "w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center",
@@ -467,7 +472,7 @@ const Dashboard = () => {
                 {/* Manage Access button */}
                 {activeNote?.role === "OWNER" ? (
                   <button
-                    onClick={() => setIsSettingsOpen(true)}
+                    onClick={() => setIsNoteModalOpen(true)}
                     className={cn(
                       "flex items-center gap-2 px-3 lg:px-6 py-2 lg:py-2.5 bg-brand-primary/10 border border-brand-primary/30 rounded-xl",
                       "text-[9px] font-black uppercase tracking-[0.2em] text-brand-primary hover:bg-brand-primary",
@@ -562,11 +567,16 @@ const Dashboard = () => {
       </div>
 
       <NoteSettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
+        isOpen={isNoteModalOpen}
+        onClose={() => setIsNoteModalOpen(false)}
         note={activeNote}
         onUpdate={updateActiveNoteInList}
         token={token}
+      />
+
+      <SettingsModal
+        isOpen={isUserModalOpen}
+        onClose={() => setIsUserModalOpen(false)}
       />
     </div>
   );

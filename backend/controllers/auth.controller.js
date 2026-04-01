@@ -25,10 +25,34 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    // Special case: Admin-reset user (password is null or empty)
+    if (!user.password || user.password === '') {
+      const token = jwt.sign(
+        { id: user.id, email: user.email, name: user.name },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' } // Short-lived token for reset period
+      );
+      return res.json({
+        token,
+        user: { id: user.id, email: user.email, name: user.name },
+        needsReset: true
+      });
+    }
+
+    // Standard verification
+    if (!(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, name: user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
     res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
   } catch (error) {
     res.status(400).json({ error: 'Login failed: ' + error.message });
