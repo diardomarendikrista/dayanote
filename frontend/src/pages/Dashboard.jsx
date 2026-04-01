@@ -14,6 +14,8 @@ import {
   Sun,
   Moon,
   Check,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "../utils/cn";
 
@@ -26,6 +28,7 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [saveStatus, setSaveStatus] = useState("idle");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const titleSaveTimer = useRef(null);
   const socketRef = useRef(null);
 
@@ -232,26 +235,49 @@ const Dashboard = () => {
   const canEdit = activeNote?.role === "OWNER" || activeNote?.role === "EDITOR";
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden text-foreground font-['Inter']">
+    <div className="flex h-screen bg-background overflow-hidden text-foreground font-['Inter'] relative">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[45] lg:hidden animate-in fade-in duration-300"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-80 bg-sidebar border-r border-border flex flex-col relative z-20">
-        <div className="p-10 flex items-center justify-between">
-          <h2
-            className={cn(
-              "text-2xl font-black tracking-tighter font-['Outfit'] text-foreground",
-            )}
-          >
-            DAYA<span className="text-brand-primary">NOTE</span>
-          </h2>
-          <button
-            onClick={toggleTheme}
-            className={cn(
-              "w-8 h-8 rounded-lg bg-muted/50 hover:bg-muted flex items-center justify-center",
-              "transition-colors shadow-lg border border-border cursor-pointer",
-            )}
-          >
-            {theme === "light" ? <Moon size={14} /> : <Sun size={14} />}
-          </button>
+      <div
+        className={cn(
+          "bg-sidebar border-r border-border flex flex-col fixed inset-y-0 left-0 z-50 w-80 lg:relative lg:translate-x-0 transition-transform duration-350 ease-out",
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        <div className="p-8 lg:p-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h2
+              className={cn(
+                "text-2xl font-black tracking-tighter font-['Outfit'] text-foreground",
+              )}
+            >
+              DAYA<span className="text-brand-primary">NOTE</span>
+            </h2>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className={cn(
+                "w-8 h-8 rounded-lg bg-muted/50 hover:bg-muted flex items-center justify-center",
+                "transition-colors shadow-lg border border-border cursor-pointer",
+              )}
+            >
+              {theme === "light" ? <Moon size={14} /> : <Sun size={14} />}
+            </button>
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden p-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         <div className="px-8 mb-8">
@@ -297,7 +323,10 @@ const Dashboard = () => {
                   ? "bg-brand-primary border-brand-primary text-white shadow-xl shadow-brand-primary/20"
                   : "bg-muted/30 border-border hover:border-brand-primary/30 text-muted-foreground hover:text-foreground",
               )}
-              onClick={() => setActiveNoteId(note.id)}
+              onClick={() => {
+                setActiveNoteId(note.id);
+                setIsSidebarOpen(false); // Mobile auto-close
+              }}
             >
               <div className="flex items-center gap-3 overflow-hidden">
                 <FileText
@@ -373,12 +402,31 @@ const Dashboard = () => {
       </div>
 
       {/* Main Area */}
-      <div className="flex-1 flex flex-col relative z-10 bg-background">
+      <div className="flex-1 flex flex-col relative z-10 bg-background min-w-0">
+        {/* Mobile Header */}
+        <div className="lg:hidden h-14 border-b border-border bg-background/50 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 -ml-2 text-muted-foreground hover:text-brand-primary transition-colors cursor-pointer"
+            >
+              <Menu size={20} />
+            </button>
+            <h2 className="text-lg font-black tracking-tighter font-['Outfit'] text-foreground">
+              DAYA<span className="text-brand-primary">NOTE</span>
+            </h2>
+          </div>
+          <div className="flex items-center gap-3">
+            {activeNoteId && (
+              <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
+            )}
+          </div>
+        </div>
         {activeNoteId ? (
           <>
-            <div className="h-24 border-b border-border flex items-center justify-between px-12 bg-background/50 backdrop-blur-md gap-6">
+            <div className="h-16 lg:h-24 border-b border-border flex items-center justify-between px-6 lg:px-12 bg-background/50 backdrop-blur-md gap-4 lg:gap-6 shrink-0">
               {/* Title */}
-              <div className="flex items-center gap-4 flex-1 overflow-hidden">
+              <div className="flex items-center gap-3 lg:gap-4 flex-1 overflow-hidden">
                 <div className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
                 <input
                   type="text"
@@ -388,7 +436,7 @@ const Dashboard = () => {
                   onBlur={handleTitleBlur}
                   disabled={!canEdit}
                   className={cn(
-                    "text-2xl font-black bg-transparent outline-none border-none focus:ring-0 w-full",
+                    "text-lg lg:text-2xl font-black bg-transparent outline-none border-none focus:ring-0 w-full",
                     "placeholder:text-muted/50 uppercase tracking-tighter text-foreground min-w-0 disabled:opacity-50 font-['Outfit']",
                   )}
                   placeholder="Note Title"
@@ -421,12 +469,13 @@ const Dashboard = () => {
                   <button
                     onClick={() => setIsSettingsOpen(true)}
                     className={cn(
-                      "flex items-center gap-2 px-6 py-2.5 bg-brand-primary/10 border border-brand-primary/30 rounded-xl",
+                      "flex items-center gap-2 px-3 lg:px-6 py-2 lg:py-2.5 bg-brand-primary/10 border border-brand-primary/30 rounded-xl",
                       "text-[9px] font-black uppercase tracking-[0.2em] text-brand-primary hover:bg-brand-primary",
                       "hover:text-white transition-all shadow-lg font-['Outfit'] cursor-pointer",
                     )}
                   >
-                    <Share2 size={13} /> Share Note
+                    <Share2 size={13} />{" "}
+                    <span className="hidden sm:inline">Share Note</span>
                   </button>
                 ) : (
                   <button
@@ -437,12 +486,13 @@ const Dashboard = () => {
                       toast.success("Link copied!");
                     }}
                     className={cn(
-                      "flex items-center gap-2 px-6 py-2.5 bg-stone-900 border border-stone-800 rounded-xl",
+                      "flex items-center gap-2 px-3 lg:px-6 py-2 lg:py-2.5 bg-stone-900 border border-stone-800 rounded-xl",
                       "text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 hover:text-white",
                       "transition-all shadow-lg cursor-pointer",
                     )}
                   >
-                    <Share2 size={13} /> Copy Link
+                    <Share2 size={13} />{" "}
+                    <span className="hidden sm:inline">Copy Link</span>
                   </button>
                 )}
 
@@ -461,7 +511,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-16 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 lg:p-16 custom-scrollbar">
               <div className="max-w-4xl mx-auto">
                 <CollaborativeEditor
                   key={activeNoteId}
@@ -471,13 +521,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <NoteSettingsModal
-              isOpen={isSettingsOpen}
-              onClose={() => setIsSettingsOpen(false)}
-              note={activeNote}
-              onUpdate={updateActiveNoteInList}
-              token={token}
-            />
           </>
         ) : (
           <div className="flex-1 flex flex-col justify-center items-center text-center p-12 space-y-10">
@@ -517,6 +560,14 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      <NoteSettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        note={activeNote}
+        onUpdate={updateActiveNoteInList}
+        token={token}
+      />
     </div>
   );
 };

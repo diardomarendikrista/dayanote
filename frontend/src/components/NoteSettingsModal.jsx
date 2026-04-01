@@ -137,20 +137,32 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
   };
 
   return (
-    <div className={cn("fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-sm bg-black/60 font-['Inter']")}>
-      <div className={cn(
-        "bg-card border border-border w-full max-w-lg rounded-[2.5rem] overflow-hidden",
-        "shadow-2xl animate-in fade-in zoom-in duration-300",
-      )}>
+    <div
+      className={cn(
+        "fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 backdrop-blur-sm bg-black/60 font-['Inter']",
+      )}
+    >
+      <div
+        className={cn(
+          "bg-card border border-border w-full max-w-lg rounded-3xl sm:rounded-[2.5rem] overflow-hidden",
+          "shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col",
+        )}
+      >
         {/* Header */}
-        <div className={cn("p-8 border-b border-border/50 flex items-center justify-between bg-muted/30")}>
+        <div
+          className={cn(
+            "p-6 sm:p-8 border-b border-border/50 flex items-center justify-between bg-muted/30 shrink-0",
+          )}
+        >
           <div>
             <h3 className="text-xl font-black text-foreground uppercase tracking-tighter">
               Access Control
             </h3>
-            <p className={cn(
-              "text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1 font-['Outfit']",
-            )}>
+            <p
+              className={cn(
+                "text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1 font-['Outfit']",
+              )}
+            >
               Configure Note Permissions
             </p>
           </div>
@@ -162,7 +174,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
           </button>
         </div>
 
-        <div className="p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 custom-scrollbar">
           {/* Public Link Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -181,9 +193,11 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                   <h4 className="text-sm font-black text-foreground uppercase tracking-tight">
                     Public Access
                   </h4>
-                  <p className={cn(
-                    "text-[10px] text-muted-foreground font-bold uppercase tracking-widest",
-                  )}>
+                  <p
+                    className={cn(
+                      "text-[10px] text-muted-foreground font-bold uppercase tracking-widest",
+                    )}
+                  >
                     {note.isPublic
                       ? "Anyone with the link can view"
                       : note.permissions?.length > 0
@@ -250,7 +264,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
             </h4>
             <form
               onSubmit={handleAddPermission}
-              className="flex gap-2"
+              className="flex flex-col sm:flex-row gap-2"
             >
               <div className="relative flex-1 group">
                 <Mail
@@ -269,23 +283,26 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                   )}
                 />
               </div>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className={cn(
-                  "bg-input border border-border rounded-xl px-3 text-[10px]",
-                  "font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-brand-primary text-foreground cursor-pointer",
-                )}
-              >
-                <option value="VIEWER">Viewer</option>
-                <option value="EDITOR">Editor</option>
-              </select>
-              <button
-                disabled={loading || !email}
-                className="p-3 bg-muted hover:bg-brand-primary text-muted-foreground hover:text-white rounded-xl transition-all disabled:opacity-30 cursor-pointer"
-              >
-                <UserPlus size={18} />
-              </button>
+              <div className="flex gap-2">
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className={cn(
+                    "flex-1 sm:flex-none bg-input border border-border rounded-xl px-3 text-[10px]",
+                    "font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-brand-primary text-foreground cursor-pointer",
+                  )}
+                >
+                  <option value="VIEWER">Viewer</option>
+                  <option value="EDITOR">Editor</option>
+                </select>
+                <button
+                  type="submit"
+                  disabled={loading || !email}
+                  className="p-3 bg-muted hover:bg-brand-primary text-muted-foreground hover:text-white rounded-xl transition-all disabled:opacity-30 cursor-pointer"
+                >
+                  <UserPlus size={18} />
+                </button>
+              </div>
             </form>
           </div>
 
@@ -296,22 +313,28 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
             </h4>
             <div className="space-y-2">
               {/* Owner */}
-              <div className={cn(
-                "flex items-center justify-between p-4 bg-muted/20 border border-border/50 rounded-2xl",
-              )}>
+              <div
+                className={cn(
+                  "flex items-center justify-between p-4 bg-muted/20 border border-border/50 rounded-2xl",
+                )}
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-white text-[10px] font-black uppercase tracking-tighter shadow-lg shadow-brand-primary/20">
                     {note.owner?.name?.charAt(0)}
                   </div>
                   <div>
-                    <h5 className={cn(
-                      "text-[10px] font-black text-foreground uppercase tracking-widest",
-                    )}>
+                    <h5
+                      className={cn(
+                        "text-[10px] font-black text-foreground uppercase tracking-widest",
+                      )}
+                    >
                       {note.owner?.name} (You)
                     </h5>
-                    <p className={cn(
-                      "text-[8px] text-muted-foreground font-bold uppercase tracking-widest",
-                    )}>
+                    <p
+                      className={cn(
+                        "text-[8px] text-muted-foreground font-bold uppercase tracking-widest",
+                      )}
+                    >
                       {note.owner?.email}
                     </p>
                   </div>
@@ -330,26 +353,32 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                 <div
                   key={perm.id}
                   className={cn(
-                    "flex items-center justify-between p-4 bg-input/50 border border-border/50",
-                    "rounded-2xl group hover:border-brand-primary/30 transition-all",
+                    "flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-input/50 border border-border/50",
+                    "rounded-2xl group hover:border-brand-primary/30 transition-all gap-4",
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "w-8 h-8 rounded-lg bg-muted flex items-center justify-center",
-                      "text-muted-foreground text-[10px] font-black uppercase tracking-tighter",
-                    )}>
+                    <div
+                      className={cn(
+                        "w-8 h-8 rounded-lg bg-muted flex items-center justify-center",
+                        "text-muted-foreground text-[10px] font-black uppercase tracking-tighter",
+                      )}
+                    >
                       {perm.user.name?.charAt(0)}
                     </div>
                     <div>
-                      <h5 className={cn(
-                        "text-[10px] font-black text-foreground uppercase tracking-widest",
-                      )}>
+                      <h5
+                        className={cn(
+                          "text-[10px] font-black text-foreground uppercase tracking-widest",
+                        )}
+                      >
                         {perm.user.name}
                       </h5>
-                      <p className={cn(
-                        "text-[8px] text-muted-foreground font-bold uppercase tracking-widest",
-                      )}>
+                      <p
+                        className={cn(
+                          "text-[8px] text-muted-foreground font-bold uppercase tracking-widest",
+                        )}
+                      >
                         {perm.user.email}
                       </p>
                     </div>
@@ -384,7 +413,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-8 border-t border-border flex justify-end bg-muted/10">
+        <div className="p-6 sm:p-8 border-t border-border flex justify-end bg-muted/10 shrink-0">
           <button
             onClick={onClose}
             className={cn(
@@ -392,7 +421,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
               "rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border border-border cursor-pointer",
             )}
           >
-            Closed
+            Close
           </button>
         </div>
       </div>

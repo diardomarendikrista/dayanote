@@ -33,11 +33,17 @@ const ToolbarButton = ({ onClick, isActive, disabled, title, children }) => (
 const EditorToolbar = ({ editor, readOnly }) => {
   if (!editor || readOnly)
     return (
-      <div className={cn("flex items-center gap-3 px-6 py-3 border-b border-border bg-background/50")}>
-        <div className={cn(
-          "flex items-center gap-2 px-3 py-1 bg-muted border border-border rounded-lg",
-          "text-[9px] font-black text-muted-foreground uppercase tracking-widest",
-        )}>
+      <div
+        className={cn(
+          "flex items-center gap-3 px-6 py-3 border-b border-border bg-background/50",
+        )}
+      >
+        <div
+          className={cn(
+            "flex items-center gap-2 px-3 py-1 bg-muted border border-border rounded-lg",
+            "text-[9px] font-black text-muted-foreground uppercase tracking-widest",
+          )}
+        >
           <Eye
             size={12}
             className="text-brand-primary"
@@ -48,9 +54,11 @@ const EditorToolbar = ({ editor, readOnly }) => {
     );
 
   return (
-    <div className={cn(
-      "flex items-center gap-1 px-4 py-2.5 border-b border-border bg-background flex-wrap",
-    )}>
+    <div
+      className={cn(
+        "flex items-center gap-1 px-4 py-2.5 border-b border-border bg-background flex-wrap",
+      )}
+    >
       {/* Headings */}
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -206,7 +214,7 @@ const EditorInstance = ({ ydoc, readOnly }) => {
         editor={editor}
         readOnly={readOnly}
       />
-      <div className="p-10 md:p-14">
+      <div className="p-4 md:p-8">
         <EditorContent editor={editor} />
       </div>
     </div>
@@ -248,10 +256,12 @@ const CollaborativeEditor = ({ noteId, readOnly = false }) => {
 
   if (status === "denied") {
     return (
-      <div className={cn(
-        "flex flex-col justify-center items-center min-h-[400px] space-y-4 bg-muted/30",
-        "rounded-2xl border border-brand-primary/20",
-      )}>
+      <div
+        className={cn(
+          "flex flex-col justify-center items-center min-h-[400px] space-y-4 bg-muted/30",
+          "rounded-2xl border border-brand-primary/20",
+        )}
+      >
         <Lock
           size={32}
           className="text-brand-primary mb-2"
@@ -270,9 +280,11 @@ const CollaborativeEditor = ({ noteId, readOnly = false }) => {
     return (
       <div className="flex flex-col justify-center items-center min-h-[400px] space-y-4">
         <div className="w-10 h-10 border-2 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className={cn(
-          "text-xs font-black text-stone-500 uppercase tracking-widest font-['Outfit']",
-        )}>
+        <p
+          className={cn(
+            "text-xs font-black text-stone-500 uppercase tracking-widest font-['Outfit']",
+          )}
+        >
           Synchronizing Instance...
         </p>
       </div>
@@ -305,10 +317,12 @@ const CollaborativeEditor = ({ noteId, readOnly = false }) => {
         </div>
       </div>
 
-      <div className={cn(
-        "bg-card rounded-[2rem] border border-border overflow-hidden",
-        "shadow-[0_0_80px_-20px_rgba(168,28,28,0.1)] focus-within:border-brand-primary/50 transition-all duration-500",
-      )}>
+      <div
+        className={cn(
+          "bg-card rounded-[2rem] border border-border overflow-hidden",
+          "shadow-[0_0_80px_-20px_rgba(168,28,28,0.1)] focus-within:border-brand-primary/50 transition-all duration-500",
+        )}
+      >
         <EditorInstance
           ydoc={ydoc}
           readOnly={readOnly}
