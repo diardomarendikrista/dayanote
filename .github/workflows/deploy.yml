@@ -24,7 +24,7 @@ jobs:
           npm install --legacy-peer-deps
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
           npx prisma generate
-          pm2 restart dayanote-be
+          npx pm2 restart dayanote-be
 
       # - name: Deploy Frontend (Build)
       #   run: |
