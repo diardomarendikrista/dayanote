@@ -16,15 +16,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Deploy Frontend (Build)
+      - name: Update Frontend Code (Pull Only)
         run: |
-          cd frontend
-          npm install
-          npm run build
-          # Jika frontend di-serve pakai PM2 juga (sebagai folder dist), aktifkan baris di bawah:
-          # npx pm2 restart dayanote-fe
+          echo "Frontend code updated via git checkout. Skipping build and restart as requested."
