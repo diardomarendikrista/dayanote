@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppStore } from "../../store/useAppStore";
 import CollaborativeEditor from "../../components/CollaborativeEditor";
 import NoteSettingsModal from "../../components/NoteSettingsModal";
@@ -20,8 +21,9 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
 
 const Dashboard = () => {
   const { user, token, logout, theme, toggleTheme } = useAppStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeNoteId = searchParams.get("note");
   const [notes, setNotes] = useState([]);
-  const [activeNoteId, setActiveNoteId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [saveStatus, setSaveStatus] = useState("idle");
 
@@ -64,7 +66,7 @@ const Dashboard = () => {
     socket.on("access_revoked", ({ noteId }) => {
       setNotes((prev) => prev.filter((n) => n.id !== noteId));
       if (activeNoteId === noteId) {
-        setActiveNoteId(null);
+        setSearchParams({});
         toast.info("Access to this note has been revoked.", {
           duration: 5000,
         });
@@ -74,7 +76,7 @@ const Dashboard = () => {
     socket.on("note_deleted", ({ noteId }) => {
       setNotes((prev) => prev.filter((n) => n.id !== noteId));
       if (activeNoteId === noteId) {
-        setActiveNoteId(null);
+        setSearchParams({});
         toast.info("This note has been discarded by the owner.");
       }
     });
@@ -114,7 +116,7 @@ const Dashboard = () => {
         } catch (err) {
           if (err.response?.status === 403) {
             setNotes((prev) => prev.filter((n) => n.id !== noteId));
-            setActiveNoteId(null);
+            setSearchParams({});
             toast.error("You no longer have access to this document.");
           }
         }
@@ -157,7 +159,7 @@ const Dashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setNotes([res.data, ...notes]);
-      setActiveNoteId(res.data.id);
+      setSearchParams({ note: res.data.id });
       setIsCreateModalOpen(false);
       toast.success("New note created successfully.");
     } catch (err) {
@@ -175,7 +177,7 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotes(notes.filter((n) => n.id !== noteToDelete));
-      if (activeNoteId === noteToDelete) setActiveNoteId(null);
+      if (activeNoteId === noteToDelete) setSearchParams({});
       setIsDeleteModalOpen(false);
       setNoteToDelete(null);
       toast.success("Note has been permanently deleted.");
@@ -245,6 +247,11 @@ const Dashboard = () => {
     saveNoteFields(activeNoteId, { title: newTitle });
   };
 
+  const handleLogoClick = () => {
+    setSearchParams({});
+    setIsSidebarOpen(false);
+  };
+
   const updateActiveNoteInList = (updatedNote) => {
     setNotes((prev) =>
       prev.map((n) => (n.id === updatedNote.id ? updatedNote : n)),
@@ -279,10 +286,12 @@ const Dashboard = () => {
         filteredNotes={filteredNotes}
         activeNoteId={activeNoteId}
         onSelectNote={(id) => {
-          setActiveNoteId(id);
+          const isReturningFromHome = !activeNoteId;
+          setSearchParams({ note: id }, { replace: !isReturningFromHome });
           setIsSidebarOpen(false);
         }}
         onCreateNote={() => setIsCreateModalOpen(true)}
+        onLogoClick={handleLogoClick}
         user={user}
         onLogout={() => setIsLogoutModalOpen(true)}
         onOpenSettings={() => setIsUserModalOpen(true)}
@@ -292,6 +301,7 @@ const Dashboard = () => {
       <div className="flex-1 flex flex-col relative z-10 bg-background min-w-0">
         <MobileHeader
           onOpenSidebar={() => setIsSidebarOpen(true)}
+          onLogoClick={handleLogoClick}
           activeNoteId={activeNoteId}
         />
 
@@ -299,6 +309,7 @@ const Dashboard = () => {
           <>
             <Header
               activeNote={activeNote}
+              onLogoClick={handleLogoClick}
               onTitleChange={handleTitleChange}
               onTitleFocus={handleTitleFocus}
               onTitleBlur={handleTitleBlur}
@@ -322,7 +333,14 @@ const Dashboard = () => {
             </div>
           </>
         ) : (
-          <EmptyState onCreateNote={() => setIsCreateModalOpen(true)} />
+          <EmptyState
+            notes={notes}
+            onSelectNote={(id) => {
+              const isReturningFromHome = !activeNoteId;
+              setSearchParams({ note: id }, { replace: !isReturningFromHome });
+            }}
+            onCreateNote={() => setIsCreateModalOpen(true)}
+          />
         )}
       </div>
 

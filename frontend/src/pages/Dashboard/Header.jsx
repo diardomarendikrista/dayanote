@@ -11,25 +11,43 @@ const Header = ({
   saveStatus,
   onOpenShareModal,
   onDeleteNote,
+  onLogoClick,
 }) => {
   return (
     <div className="h-18 lg:h-24 border-b border-border flex items-center justify-between px-6 lg:px-12 bg-background/50 backdrop-blur-md gap-4 lg:gap-6 shrink-0">
-      {/* Title */}
-      <div className="flex items-center gap-3 lg:gap-4 flex-1 overflow-hidden">
-        <div className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
-        <input
-          type="text"
-          value={activeNote?.title || ""}
-          onChange={onTitleChange}
-          onFocus={onTitleFocus}
-          onBlur={onTitleBlur}
-          disabled={!canEdit}
-          className={cn(
-            "text-lg lg:text-2xl font-black bg-transparent outline-none border-none focus:ring-0 w-full",
-            "placeholder:text-muted/50 uppercase tracking-tighter text-foreground min-w-0 disabled:opacity-50 font-['Outfit']",
-          )}
-          placeholder="Note Title"
-        />
+      {/* Logo & Title */}
+      <div className="flex items-center gap-3 lg:gap-6 flex-1 overflow-hidden">
+        <button
+          onClick={onLogoClick}
+          className="hidden md:flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer shrink-0"
+          title="Return to Dashboard"
+        >
+          <div className="w-8 h-8 bg-brand-primary rounded-lg flex items-center justify-center shadow-lg shadow-brand-primary/20">
+            <span className="text-white text-xs font-black">D</span>
+          </div>
+          <h2 className="text-sm font-black tracking-tighter font-['Outfit'] text-foreground hidden lg:block uppercase">
+            DAYA<span className="text-brand-primary">NOTE</span>
+          </h2>
+        </button>
+
+        <div className="w-px h-6 bg-border shrink-0 hidden md:block" />
+
+        <div className="flex items-center gap-3 lg:gap-4 flex-1 overflow-hidden">
+          <div className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
+          <input
+            type="text"
+            value={activeNote?.title || ""}
+            onChange={onTitleChange}
+            onFocus={onTitleFocus}
+            onBlur={onTitleBlur}
+            disabled={!canEdit}
+            className={cn(
+              "text-lg lg:text-2xl font-black bg-transparent outline-none border-none focus:ring-0 w-full",
+              "placeholder:text-muted/50 uppercase tracking-tighter text-foreground min-w-0 disabled:opacity-50 font-['Outfit']",
+            )}
+            placeholder="Note Title"
+          />
+        </div>
       </div>
 
       {/* Action bar */}

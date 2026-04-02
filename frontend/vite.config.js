@@ -13,24 +13,34 @@ export default defineConfig({
     jsconfigPaths(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
-      workbox: { globPatterns: ['**/*.{js,css,html,ico,png,svg}'] },
+      registerType: "autoUpdate",
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+      },
       manifest: {
-        name: 'DayaNote', short_name: 'DayaNote', theme_color: '#ffffff', display: "standalone",
+        name: "DayaNote",
+        short_name: "DayaNote",
+        description: "Secure & Collaborative Intelligence Memorandum System",
+        theme_color: "#0c0a09",
+        background_color: "#0c0a09",
+        display: "standalone",
+        orientation: "portrait",
         icons: [
           {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any maskable",
           },
           {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
-      }
-    })
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable",
+          },
+        ],
+      },
+    }),
   ],
   server: { host: "0.0.0.0", port: 3000, open: true },
   resolve: { alias: { "./runtimeConfig": "./runtimeConfig.browser" } },

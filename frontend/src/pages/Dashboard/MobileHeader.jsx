@@ -1,6 +1,6 @@
 import { Menu } from "lucide-react";
 
-const MobileHeader = ({ onOpenSidebar, activeNoteId }) => {
+const MobileHeader = ({ onOpenSidebar, activeNoteId, onLogoClick }) => {
   return (
     <div className="lg:hidden h-14 border-b border-border bg-background/50 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
       <div className="flex items-center gap-4">
@@ -10,9 +10,14 @@ const MobileHeader = ({ onOpenSidebar, activeNoteId }) => {
         >
           <Menu size={20} />
         </button>
-        <h2 className="text-lg font-black tracking-tighter font-['Outfit'] text-foreground">
-          DAYA<span className="text-brand-primary">NOTE</span>
-        </h2>
+        <button
+          onClick={onLogoClick}
+          className="hover:opacity-80 transition-opacity cursor-pointer text-left"
+        >
+          <h2 className="text-lg font-black tracking-tighter font-['Outfit'] text-foreground">
+            DAYA<span className="text-brand-primary">NOTE</span>
+          </h2>
+        </button>
       </div>
       <div className="flex items-center gap-3">
         {activeNoteId && (

@@ -17,6 +17,7 @@ const Sidebar = ({
   user,
   onLogout,
   onOpenSettings,
+  onLogoClick,
 }) => {
   return (
     <div
@@ -26,7 +27,11 @@ const Sidebar = ({
       )}
     >
       <div className="p-8 lg:p-10 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <button
+          onClick={onLogoClick}
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer group"
+          title="Return to Dashboard"
+        >
           <h2
             className={cn(
               "text-2xl font-black tracking-tighter font-['Outfit'] text-foreground",
@@ -34,7 +39,10 @@ const Sidebar = ({
           >
             DAYA<span className="text-brand-primary">NOTE</span>
           </h2>
-        </div>
+          <span className="text-[10px] font-black text-brand-primary/50 uppercase tracking-[0.2em] ml-1 group-hover:text-brand-primary transition-colors">
+            v1.3.0
+          </span>
+        </button>
         <div className="flex items-center gap-2">
           <button
             onClick={onToggleTheme}

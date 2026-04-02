@@ -139,7 +139,7 @@ const NotePage = () => {
             to="/dashboard"
             className="text-xl md:text-2xl font-black tracking-tighter text-white hover:opacity-80 transition-opacity shrink-0"
           >
-            DAYA<span className="text-[#a81c1c]">NOTE</span>
+            DAYA<span className="text-brand-primary">NOTE</span>
           </Link>
           <div className="w-px h-6 bg-stone-800 shrink-0 hidden md:block" />
           <div className="hidden md:flex items-center gap-4 overflow-hidden">
