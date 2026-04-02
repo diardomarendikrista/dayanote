@@ -1,9 +1,12 @@
-name: Deploy DayaNote to Windows Server
+name: Deploy Backend to Windows Server
 
 on:
   push:
     branches:
-      - main # Akan jalan setiap kali ada push ke branch main
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend.yml"
 
 jobs:
   deploy:
@@ -16,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22" # Sesuaikan dengan versi Node.js di server
+          node-version: "22"
 
       - name: Deploy Backend
         run: |
@@ -25,11 +28,3 @@ jobs:
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
           npx prisma generate
           npx pm2 restart dayanote-be
-
-      # - name: Deploy Frontend (Build)
-      #   run: |
-      #     cd frontend
-      #     npm install
-      #     npm run build
-      #     # Jika frontend di-serve pakai PM2 juga, tambahkan perintah restart di sini
-      #     # contoh: pm2 restart dayanote-fe

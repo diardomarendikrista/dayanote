@@ -1,0 +1,30 @@
+name: Deploy Frontend to Windows Server
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".github/workflows/deploy-frontend.yml"
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Deploy Frontend (Build)
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          # Jika frontend di-serve pakai PM2 juga (sebagai folder dist), aktifkan baris di bawah:
+          # npx pm2 restart dayanote-fe
