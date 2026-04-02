@@ -65,7 +65,7 @@ const createHocuspocusServer = (io) => {
           return note?.content ? Buffer.from(note.content, 'hex') : null;
         },
         store: async ({ documentName, state }) => {
-          await prisma.note.update({
+          const updatedNote = await prisma.note.update({
             where: { id: documentName },
             data: {
               content: state.toString('hex'),
@@ -73,8 +73,9 @@ const createHocuspocusServer = (io) => {
             },
           });
           // Notify via Socket.io if io instance is provided
+          // We send note_updated instead of document_saved for real-time sorting
           if (io) {
-            io.to(`note_${documentName}`).emit('document_saved', { noteId: documentName });
+            io.to(`note_${documentName}`).emit('note_updated', updatedNote);
           }
         },
       }),

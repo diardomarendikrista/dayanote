@@ -40,7 +40,7 @@ const Sidebar = ({
             DAYA<span className="text-brand-primary">NOTE</span>
           </h2>
           <span className="px-2 py-0.5 bg-brand-primary/10 text-brand-primary rounded-md text-[8px] font-black border border-brand-primary/20 backdrop-blur-md">
-            v1.4.3
+            v1.4.4
           </span>
         </button>
         <div className="flex items-center gap-2">

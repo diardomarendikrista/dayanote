@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.4.4] - 2026-04-02
+### Added
+- **Real-time Note Ordering**: Notes in the sidebar and dashboard directory now automatically re-sort to the top as soon as they are edited or saved.
+- **Improved Sync**: Enhanced Hocuspocus backend to broadcast full note metadata updates (including `updatedAt`), ensuring all collaborators see the correct sort order instantly.
+
 ## [1.4.3] - 2026-04-02
 ### Fixed
 - **Permission Elevation**: Resolved an issue where collaborators with the `EDITOR` role were incorrectly restricted from updating note titles (403 Forbidden). Editors now have full title/content editing rights.

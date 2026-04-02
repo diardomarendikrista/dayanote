@@ -58,9 +58,10 @@ const Dashboard = () => {
     });
 
     socket.on("title_updated", ({ noteId, title }) => {
-      setNotes((prev) =>
-        prev.map((n) => (n.id === noteId ? { ...n, title } : n)),
-      );
+      setNotes((prev) => {
+        const updated = prev.map((n) => (n.id === noteId ? { ...n, title } : n));
+        return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      });
     });
 
     socket.on("access_revoked", ({ noteId }) => {
@@ -97,11 +98,12 @@ const Dashboard = () => {
     });
 
     socket.on("note_updated", (updatedNote) => {
-      setNotes((prev) =>
-        prev.map((n) =>
+      setNotes((prev) => {
+        const updated = prev.map((n) =>
           n.id === updatedNote.id ? { ...n, ...updatedNote } : n,
-        ),
-      );
+        );
+        return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      });
     });
 
     socket.on("check_access", async ({ noteId }) => {
@@ -110,9 +112,10 @@ const Dashboard = () => {
           const res = await axios.get(`${API_URL}/api/notes/${noteId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          setNotes((prev) =>
-            prev.map((n) => (n.id === noteId ? { ...n, ...res.data } : n)),
-          );
+          setNotes((prev) => {
+            const updated = prev.map((n) => (n.id === noteId ? { ...n, ...res.data } : n));
+            return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+          });
         } catch (err) {
           if (err.response?.status === 403) {
             setNotes((prev) => prev.filter((n) => n.id !== noteId));
@@ -206,9 +209,10 @@ const Dashboard = () => {
             fields,
             { headers: { Authorization: `Bearer ${token}` } },
           );
-          setNotes((prev) =>
-            prev.map((n) => (n.id === noteId ? { ...n, ...res.data } : n)),
-          );
+          setNotes((prev) => {
+            const updated = prev.map((n) => (n.id === noteId ? { ...n, ...res.data } : n));
+            return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+          });
           setSaveStatus("saved");
           setTimeout(() => setSaveStatus("idle"), 2000);
         } catch {
@@ -253,9 +257,10 @@ const Dashboard = () => {
   };
 
   const updateActiveNoteInList = (updatedNote) => {
-    setNotes((prev) =>
-      prev.map((n) => (n.id === updatedNote.id ? updatedNote : n)),
-    );
+    setNotes((prev) => {
+      const updated = prev.map((n) => (n.id === updatedNote.id ? updatedNote : n));
+      return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    });
   };
 
   const filteredNotes = notes.filter((n) =>
