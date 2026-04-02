@@ -39,8 +39,8 @@ const Sidebar = ({
           >
             DAYA<span className="text-brand-primary">NOTE</span>
           </h2>
-          <span className="text-[10px] font-black text-brand-primary/50 uppercase tracking-[0.2em] ml-1 group-hover:text-brand-primary transition-colors">
-            v1.4.0
+          <span className="px-2 py-0.5 bg-brand-primary/10 text-brand-primary rounded-md text-[8px] font-black border border-brand-primary/20 backdrop-blur-md">
+            v1.4.1
           </span>
         </button>
         <div className="flex items-center gap-2">

@@ -15,7 +15,7 @@ const getBackupData = async () => {
     notes,
     permissions,
     timestamp: new Date().toISOString(),
-    version: '1.4.0'
+    version: '1.4.0',
   };
 };
 

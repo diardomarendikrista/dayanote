@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.4.1] - 2026-04-02
+### Fixed
+- Fixed "Cannot read properties of undefined (reading 'name')" error when opening shared notes via deep link.
+- Added protective optional chaining to `NoteSettingsModal` to handle incomplete data during initial render.
+
 ## [1.4.0] - 2026-04-02
 ### Added
 - **Database Auto-Backup**: Integrated Google Drive API for scheduled database backups (every 12 hours).

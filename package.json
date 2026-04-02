@@ -1,0 +1,15 @@
+{
+  "name": "dayanote",
+  "version": "1.4.1",
+  "description": "Unified Dayanote Smart System",
+  "main": "index.js",
+  "scripts": {
+    "start:be": "npm start --prefix backend",
+    "start:fe": "npm run dev --prefix frontend",
+    "dev": "npx concurrently \"npm run start:be\" \"npm run start:fe\"",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

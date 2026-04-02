@@ -345,7 +345,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                       "text-muted-foreground text-[10px] font-black uppercase tracking-tighter",
                     )}
                   >
-                    {perm.user.name?.charAt(0)}
+                    {perm.user?.name?.charAt(0)}
                   </div>
                   <div>
                     <h5
@@ -353,14 +353,14 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                         "text-[10px] font-black text-foreground uppercase tracking-widest",
                       )}
                     >
-                      {perm.user.name}
+                      {perm.user?.name}
                     </h5>
                     <p
                       className={cn(
                         "text-[8px] text-muted-foreground font-bold uppercase tracking-widest",
                       )}
                     >
-                      {perm.user.email}
+                      {perm.user?.email}
                     </p>
                   </div>
                 </div>
@@ -368,7 +368,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
                   <select
                     value={perm.role}
                     onChange={(e) =>
-                      handleUpdatePermission(perm.user.email, e.target.value)
+                      handleUpdatePermission(perm.user?.email, e.target.value)
                     }
                     className={cn(
                       "flex items-center gap-2 px-3 py-1 rounded-lg border text-[8px] font-black uppercase tracking-[0.2em] outline-none transition-all cursor-pointer font-['Outfit']",
