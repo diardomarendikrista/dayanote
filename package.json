@@ -1,7 +1,7 @@
 {
   "name": "dayanote",
-  "version": "1.4.4",
-  "description": "Unified Dayanote Smart System",
+  "version": "0.2.4",
+  "description": "Dayanote",
   "main": "index.js",
   "scripts": {
     "start:be": "npm start --prefix backend",
