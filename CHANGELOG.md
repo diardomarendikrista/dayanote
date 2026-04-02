@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file. Versioning 
 
 ---
 
+## [0.3.0] - 2026-04-02
+### Added
+- **Note Status Indicators**: Integrated visual icons (Lock, Globe, Users) to distinguish between Private, Public, and Shared notes at a glance.
+- **Harmonized Mobile UI**: Refactored the mobile dashboard to use the standard note component, ensuring design consistency across all devices.
+- **Compact View**: Optimized mobile list height while maintaining original font sizes and brand elements.
+### Fixed
+- **Collaborative Re-sorting**: Notes now jump to the top instantly when a collaborator makes changes to the body, without moving on initial load.
+- **Update Reliability**: Enhanced PWA Service Worker protocols to prioritize immediate updates on iOS Safari standalone mode (cleanupOutdatedCaches, clientsClaim, skipWaiting).
+
 ## [0.2.4] - 2026-04-02
 ### Added
 - **Real-time Note Ordering**: Notes now automatically re-sort to the top as soon as content is edited or saved without needing a refresh.
@@ -39,6 +48,7 @@ All notable changes to this project will be documented in this file. Versioning 
 - **Initial Release (MVP)**: Core architecture using Express, Prisma, React, and Tailwind CSS.
 - **Collaboration Suite**: Built-in Yjs and Tiptap integration for real-time multiplayer editing and permission-based sharing.
 
+[0.3.0]: https://github.com/diardomarendikrista/dayanote/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/diardomarendikrista/dayanote/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/diardomarendikrista/dayanote/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/diardomarendikrista/dayanote/compare/v0.2.1...v0.2.2

@@ -1,7 +1,9 @@
-import { FileText, ChevronRight, Plus, Search, X } from "lucide-react";
+import { FileText, Plus, Search, X } from "lucide-react";
 import { cn } from "../../utils/cn";
+import NoteItem from "./NoteItem";
 
 const EmptyState = ({
+  user,
   notes = [],
   searchTerm = "",
   onSearchChange,
@@ -112,25 +114,17 @@ const EmptyState = ({
             </div>
 
             {/* List Results */}
-            <div className="space-y-2 pb-2">
+            <div className="space-y-3 pb-2 w-full">
               {notes.length > 0 ? (
                 sortedNotes.map((note) => (
-                  <button
+                  <NoteItem
                     key={note.id}
+                    note={note}
+                    userId={user?.id}
                     onClick={() => onSelectNote(note.id)}
-                    className="w-full flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-2xl hover:bg-muted/50 transition-all group active:scale-[0.98] cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3 overflow-hidden text-left">
-                      <div className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
-                      <span className="text-[11px] font-black uppercase tracking-tight text-foreground truncate font-['Outfit']">
-                        {note.title || "Untitled Note"}
-                      </span>
-                    </div>
-                    <ChevronRight
-                      size={14}
-                      className="text-stone-700 group-hover:text-brand-primary transition-colors shrink-0"
-                    />
-                  </button>
+                    showChevron={true}
+                    compact={true}
+                  />
                 ))
               ) : isSearching ? (
                 <div className="py-12 flex flex-col items-center space-y-3 opacity-50">

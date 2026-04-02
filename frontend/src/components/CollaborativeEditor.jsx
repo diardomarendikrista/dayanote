@@ -6,7 +6,7 @@ import Collaboration from "@tiptap/extension-collaboration";
 import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { IndexeddbPersistence } from "y-indexeddb";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { Lock, Eye } from "lucide-react";
 import { cn } from "../utils/cn";
@@ -185,7 +185,8 @@ const EditorToolbar = ({ editor, readOnly }) => {
   );
 };
 
-const EditorInstance = ({ ydoc, readOnly }) => {
+const EditorInstance = ({ ydoc, readOnly, onUpdate, isSynced }) => {
+
   const editor = useEditor(
     {
       extensions: [
@@ -201,6 +202,12 @@ const EditorInstance = ({ ydoc, readOnly }) => {
           class:
             "focus:outline-none min-h-[500px] max-w-none text-base md:text-lg leading-relaxed",
         },
+      },
+      onUpdate: ({ editor }) => {
+        // Only trigger update if the editor is focused (user interaction) OR if it's already synced (remote interaction)
+        if ((editor.isFocused || isSynced.current) && typeof onUpdate === "function") {
+          onUpdate();
+        }
       },
     },
     [ydoc, readOnly],
@@ -221,9 +228,10 @@ const EditorInstance = ({ ydoc, readOnly }) => {
   );
 };
 
-const CollaborativeEditor = ({ noteId, readOnly = false }) => {
+const CollaborativeEditor = ({ noteId, onUpdate, readOnly = false }) => {
   const { token } = useAppStore();
   const [ydoc, setYdoc] = useState(null);
+  const isSynced = useRef(false);
   const [status, setStatus] = useState("connecting");
 
   useEffect(() => {
@@ -242,6 +250,12 @@ const CollaborativeEditor = ({ noteId, readOnly = false }) => {
       onConnect: () => setStatus("connected"),
       onDisconnect: () => setStatus("offline"),
       onAuthenticationFailed: () => setStatus("denied"),
+      onSynced: () => {
+        // Delay slightly to prevent initial load movement
+        setTimeout(() => {
+          isSynced.current = true;
+        }, 800);
+      },
     });
 
     const timer = setTimeout(() => setYdoc(doc), 50);
@@ -325,7 +339,9 @@ const CollaborativeEditor = ({ noteId, readOnly = false }) => {
       >
         <EditorInstance
           ydoc={ydoc}
+          onUpdate={onUpdate}
           readOnly={readOnly}
+          isSynced={isSynced}
         />
       </div>
     </div>

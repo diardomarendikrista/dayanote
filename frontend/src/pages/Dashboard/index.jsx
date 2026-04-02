@@ -59,7 +59,7 @@ const Dashboard = () => {
 
     socket.on("title_updated", ({ noteId, title }) => {
       setNotes((prev) => {
-        const updated = prev.map((n) => (n.id === noteId ? { ...n, title } : n));
+        const updated = prev.map((n) => (n.id === noteId ? { ...n, title, updatedAt: new Date().toISOString() } : n));
         return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       });
     });
@@ -232,9 +232,14 @@ const Dashboard = () => {
 
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
-    setNotes(
-      notes.map((n) => (n.id === activeNoteId ? { ...n, title: newTitle } : n)),
-    );
+    setNotes((prev) => {
+      const updated = prev.map((n) =>
+        n.id === activeNoteId
+          ? { ...n, title: newTitle, updatedAt: new Date().toISOString() }
+          : n,
+      );
+      return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    });
 
     // Broadcast in real-time via Socket.io
     if (socketRef.current) {
@@ -269,6 +274,18 @@ const Dashboard = () => {
 
   const activeNote = notes.find((n) => n.id === activeNoteId);
   const canEdit = activeNote?.role === "OWNER" || activeNote?.role === "EDITOR";
+
+  const handleBodyChange = useCallback(() => {
+    setNotes((prev) => {
+      const updated = prev.map((n) =>
+        n.id === activeNoteId
+          ? { ...n, updatedAt: new Date().toISOString() }
+          : n,
+      );
+      // Only sort if the order actually changed significantly (optimistic)
+      return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    });
+  }, [activeNoteId]);
 
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground font-['Inter'] relative">
@@ -333,6 +350,7 @@ const Dashboard = () => {
                 <CollaborativeEditor
                   key={activeNoteId}
                   noteId={activeNoteId}
+                  onUpdate={handleBodyChange}
                   readOnly={!canEdit}
                 />
               </div>
@@ -340,6 +358,7 @@ const Dashboard = () => {
           </>
         ) : (
           <EmptyState
+            user={user}
             notes={filteredNotes}
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
