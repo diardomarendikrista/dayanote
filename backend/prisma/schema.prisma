@@ -23,7 +23,7 @@ model Note {
   isPublic    Boolean      @default(false)
   publicRole  Role         @default(VIEWER)
   ownerId     String
-  owner       User         @relation(fields: [ownerId], references: [id])
+  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   permissions Permission[]
@@ -34,7 +34,7 @@ model Permission {
   userId String
   noteId String
   role   Role   @default(VIEWER)
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
 
   @@unique([userId, noteId])
