@@ -139,29 +139,36 @@ exports.updateNote = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, isPublic, publicRole } = req.body;
+    
     const note = await prisma.note.findUnique({
       where: { id },
       include: { permissions: { where: { userId: req.user.id } } },
     });
 
-    if (!note) return res.status(404).json({ error: 'Note not found' });
+    if (!note) return res.status(404).json({ error: "Note not found" });
 
-    // Access logic: OWNER or EDITOR
+    // Access determination (matching getNote logic)
     const isOwner = note.ownerId === req.user.id;
     const userPermission = note.permissions[0];
-    const isEditor = userPermission && userPermission.role === 'EDITOR';
+    const isExplicitEditor = userPermission && userPermission.role === "EDITOR";
+    const isPublicEditor = note.isPublic && note.publicRole === "EDITOR";
+    
+    const canEdit = isOwner || isExplicitEditor || isPublicEditor;
 
-    if (!isOwner && !isEditor) {
-      return res.status(403).json({ error: 'You do not have permission to edit this note' });
+    if (!canEdit) {
+      console.warn(`[Auth] User ${req.user.id} denied EDIT access to note ${id}. Role: ${userPermission?.role || 'NONE'}, PublicRole: ${note.publicRole}`);
+      return res.status(403).json({ error: "You do not have permission to edit this note" });
     }
 
-    // Role-based field filtering
-    const updateData = { title, content };
+    // Prepare update data carefully
+    const updateData = {};
+    if (typeof title !== "undefined") updateData.title = title;
+    if (typeof content !== "undefined") updateData.content = content;
 
-    // Only OWNER can modify sharing settings
+    // Only OWNER can modify core sharing settings
     if (isOwner) {
-      if (typeof isPublic !== 'undefined') updateData.isPublic = isPublic;
-      if (publicRole) updateData.publicRole = publicRole;
+      if (typeof isPublic !== "undefined") updateData.isPublic = isPublic;
+      if (typeof publicRole !== "undefined") updateData.publicRole = publicRole;
     }
 
     const updatedNote = await prisma.note.update({
@@ -172,16 +179,20 @@ exports.updateNote = async (req, res) => {
     // Broadcast update
     const io = getIO(req);
     if (io) {
-      io.to(`note_${id}`).emit('note_updated', updatedNote);
+      io.to(`note_${id}`).emit("note_updated", updatedNote);
 
       if (isOwner && (isPublic === false || (publicRole && publicRole !== note.publicRole))) {
-        io.to(`note_${id}`).emit('check_access', { noteId: id });
+        io.to(`note_${id}`).emit("check_access", { noteId: id });
       }
     }
 
-    res.json({ ...updatedNote, role: isOwner ? 'OWNER' : (userPermission?.role || 'VIEWER') });
+    res.json({ 
+      ...updatedNote, 
+      role: isOwner ? "OWNER" : (userPermission?.role || (note.isPublic ? note.publicRole : "VIEWER")) 
+    });
   } catch (error) {
-    res.status(400).json({ error: 'Failed to update note: ' + error.message });
+    console.error(`[Error] updateNote failed:`, error);
+    res.status(400).json({ error: "Failed to update note: " + error.message });
   }
 };
 
