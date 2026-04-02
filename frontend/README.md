@@ -1,4 +1,4 @@
-# DayaNote Frontend
+# DayaNote Frontend 1.3.0
 
 The frontend of DayaNote is built for speed, responsiveness, and a premium user experience. It leverages modern web technologies to provide a native-app feel.
 
@@ -9,22 +9,21 @@ The frontend of DayaNote is built for speed, responsiveness, and a premium user 
 - **Framework**: React 19 + Vite 6
 - **Styling**: Tailwind CSS v4 (Industrial Theme)
 - **State Management**: Zustand
-- **Real-time Events**: Socket.io Client
-- **Utilities**: `tailwind-merge` & `clsx` (via `cn.js`)
-- **Editor**: TipTap (ProseMirror) with Yjs integration
-- **Synchronization**: Hocuspocus Provider
-- **Icons**: Lucide React
-- **Typography**: 'Outfit' (Headings) & 'Inter' (Body)
+- **Real-time Synchronization**: Yjs + Hocuspocus + Socket.io
+- **PWA Capabilities**: Service Workers (`vite-plugin-pwa`)
+- **Persistence**: IndexedDB via `y-indexeddb`
+- **Routing**: React Router 7 + useSearchParams for note selection
 
 ---
 
 ## Highlights
 
-- **Real-time Security Sync**: Instant "kick" or interface lock when permissions change or notes are deleted.
-- **Improved Shared Status**: Dynamic sidebar indicators showing `Shared`, `Public`, or `Private`.
-- **Premium Glow Aesthetic**: Industrial dark mode with custom pendar (glow) effects on the editor.
-- **Responsive Design**: Optimized for both desktop workspaces and mobile viewing.
-- **Optimized Persistence**: Local changes are stored in IndexedDB before syncing.
+- **Smart Navigation History**: Optimized browser history and deep linking via query parameters (`?note=ID`).
+- **Progressive Web App (PWA)**: Full offline-first capabilities and mobile standalone mode support.
+- **Improved Modal System**: Reusable, premium-styled Modal components with consistent logic.
+- **Mobile "Recent Activity"**: Enhanced dashboard with quick access to recent notes for mobile users.
+- **Auth Guard Redirection**: Automated redirects for authenticated users to improve session UX.
+- **Glow Industrial Aesthetic**: Optimized dark mode with custom pendar (glow) effects on the editor.
 
 ---
 
@@ -33,14 +32,14 @@ The frontend of DayaNote is built for speed, responsiveness, and a premium user 
 1. Install dependencies: `npm install`
 2. Configure `.env`:
    - `VITE_API_URL`: Your backend API URL.
-   - `VITE_WS_URL`: Your Hocuspocus WebSocket URL (ws://...).
+   - `VITE_WS_URL`: Your Hocuspocus WebSocket URL.
 3. Start development: `npm run dev`
 
 ---
 
 ## Source Overview
 
-- `/src/utils/cn.js`: Utility for safe Tailwind class merging.
-- `/src/components/CollaborativeEditor.jsx`: The heart of the app, managing TipTap and WebSocket sync.
-- `/src/components/NoteSettingsModal.jsx`: Access control UI for managing permissions.
-- `/src/pages/NotePage.jsx`: The public/shared view with real-time security listeners.
+- `/src/pages/Dashboard/index.jsx`: Modular dashboard entry point.
+- `/src/pages/Dashboard/EmptyState.jsx`: Improved home view for mobile/empty states.
+- `/src/components/Modal.jsx`: Core reusable modal primitive.
+- `/src/components/CollaborativeEditor.jsx`: The heart of the real-time TipTap editor.
