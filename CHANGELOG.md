@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.4.0] - 2026-04-02
+### Added
+- **Database Auto-Backup**: Integrated Google Drive API for scheduled database backups (every 12 hours).
+- **Automated Retention**: Backups on Google Drive are automatically cleaned up after 14 days.
+- **Manual Backup Trigger**: Added ability to trigger backups manually via internal services for testing or management.
+
+### Fixed
+- **Account Deletion (Cascade)**: Fixed an issue where users couldn't be deleted via SQL due to missing `ON DELETE CASCADE` constraints on Notes and Permissions.
+
+### Changed
+- **Version Synchronization**: Synced Backend and Frontend versions to v1.4.0.
+
+---
+
 ## [1.3.0] - 2026-04-02
 ### Added
 - **Smart Navigation History**: Implemented logical `push`/`replace` behavior. Switching between notes now replaces history, while the first note selection pushes it. Clicking "Back" returns you directly to the Home dashboard.
@@ -51,6 +65,7 @@ All notable changes to this project will be documented in this file.
 - **Core Editor**: Integration with Yjs and Tiptap for collaborative intelligence.
 - **Base Architecture**: Express backend with Prisma and React frontend with Tailwind CSS.
 
+[1.4.0]: https://github.com/diardomarendikrista/dayanote/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/diardomarendikrista/dayanote/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/diardomarendikrista/dayanote/compare/v1.1.0-beta...v1.2.0
 [1.1.0-beta]: https://github.com/diardomarendikrista/dayanote/compare/v1.0.0...v1.1.0-beta

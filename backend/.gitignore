@@ -5,3 +5,4 @@ dist
 prisma/*.db
 prisma/*.db-journal
 *.log
+temp_backups/

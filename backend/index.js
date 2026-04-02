@@ -3,6 +3,10 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { WebSocketServer } = require('ws');
 const createHocuspocusServer = require('./config/hocuspocus');
+const { initCron } = require('./services/backup.service');
+
+// Initialize Cron Jobs
+initCron();
 
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
