@@ -5,24 +5,24 @@ import { cn } from "../utils/cn";
 const ICONS = {
   success: {
     icon: Check,
-    bg: "bg-emerald-500/10",
-    border: "border-emerald-500/20",
-    text: "text-emerald-600 dark:text-emerald-400",
+    bg: "bg-card dark:bg-emerald-500/10",
+    border: "border-emerald-500/30 dark:border-emerald-500/20",
+    text: "text-emerald-700 dark:text-emerald-400",
     dot: "bg-emerald-500",
   },
   error: {
     icon: AlertTriangle,
-    bg: "bg-red-500/10",
-    border: "border-red-500/20",
-    text: "text-red-600 dark:text-red-400",
+    bg: "bg-card dark:bg-red-500/10",
+    border: "border-red-500/30 dark:border-red-500/20",
+    text: "text-red-700 dark:text-red-400",
     dot: "bg-red-500",
   },
   info: {
     icon: Info,
-    bg: "bg-[#a81c1c]/10",
-    border: "border-[#a81c1c]/20",
-    text: "text-[#a81c1c]",
-    dot: "bg-[#a81c1c]",
+    bg: "bg-card dark:bg-brand-primary/10",
+    border: "border-brand-primary/30 dark:border-brand-primary/20",
+    text: "text-brand-primary",
+    dot: "bg-brand-primary",
   },
 };
 
@@ -67,7 +67,7 @@ const ToastItem = ({ id, message, type, onRemove }) => {
         size={15}
         className={text}
       />
-      <span className={cn("text-[13px] font-bold", text)}>{message}</span>
+      <span className={cn("text-[14px] font-bold", text)}>{message}</span>
       <button
         onClick={() => {
           setVisible(false);

@@ -133,16 +133,16 @@ const NotePage = () => {
   return (
     <div className="min-h-screen bg-[#0c0a09] font-['Inter'] text-stone-300">
       {/* Top Bar */}
-      <div className="h-24 border-b border-stone-800/80 flex items-center justify-between px-12 bg-[#0c0a09]/80 sticky top-0 z-50 backdrop-blur-xl">
-        <div className="flex items-center gap-8 min-w-0">
+      <div className="h-16 md:h-24 border-b border-stone-800/80 flex items-center justify-between px-6 md:px-12 bg-[#0c0a09]/80 sticky top-0 z-50 backdrop-blur-xl">
+        <div className="flex items-center gap-4 md:gap-8 min-w-0">
           <Link
             to="/dashboard"
-            className="text-2xl font-black tracking-tighter text-white hover:opacity-80 transition-opacity"
+            className="text-xl md:text-2xl font-black tracking-tighter text-white hover:opacity-80 transition-opacity shrink-0"
           >
             DAYA<span className="text-[#a81c1c]">NOTE</span>
           </Link>
-          <div className="w-px h-6 bg-stone-800 shrink-0" />
-          <div className="flex items-center gap-4 overflow-hidden">
+          <div className="w-px h-6 bg-stone-800 shrink-0 hidden md:block" />
+          <div className="hidden md:flex items-center gap-4 overflow-hidden">
             <div
               className={cn(
                 "p-2 rounded-lg bg-stone-900 border flex items-center gap-2 shrink-0 transition-all",
@@ -183,16 +183,17 @@ const NotePage = () => {
               to="/login"
               className="flex items-center gap-2 px-6 py-3 bg-[#a81c1c] hover:bg-[#991b1b] text-white rounded-xl text-xs font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-[#a81c1c]/20 active:scale-95 font-['Outfit']"
             >
-              <LogIn size={13} /> Secure Login
+              <LogIn size={13} />{" "}
+              <span className="hidden sm:block">Secure Login</span>
             </Link>
           )}
         </div>
       </div>
 
       {/* Hero Header Area */}
-      <div className="bg-[#12100f] border-b border-stone-800/50 pt-16 pb-8">
-        <div className="max-w-5xl mx-auto px-12">
-          <div className="space-y-6">
+      <div className="bg-[#12100f] border-b border-stone-800/50 pt-8 md:pt-16 pb-4 md:pb-8">
+        <div className="max-w-5xl mx-auto px-4 md:px-12">
+          <div className="md:space-y-6">
             <div className="flex items-center gap-3">
               <Globe
                 size={14}
@@ -229,7 +230,7 @@ const NotePage = () => {
       </div>
 
       {/* Editor Content Area */}
-      <div className="max-w-5xl mx-auto px-8 pb-32 pt-12">
+      <div className="max-w-5xl mx-auto px-0 md:px-8 pb-32 pt-12">
         <div className="bg-[#12100f] border border-stone-800/50 rounded-[3rem] p-4 md:p-8 shadow-2xl relative">
           <div className="absolute top-8 right-12 z-10 pointer-events-none">
             <div className="text-[60px] font-black text-white/[0.02] uppercase tracking-tighter leading-none select-none">
@@ -244,7 +245,7 @@ const NotePage = () => {
         </div>
 
         {/* Footer Meta */}
-        <div className="mt-12 flex justify-between items-center text-stone-600">
+        <div className="mt-12 flex justify-between items-center text-stone-600 px-4 md:px-0 flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-stone-900 border border-stone-800 flex items-center justify-center font-black text-xs">
               DN
