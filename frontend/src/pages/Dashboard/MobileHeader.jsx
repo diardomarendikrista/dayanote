@@ -1,8 +1,14 @@
-import { Menu } from "lucide-react";
+import { Menu, Plus } from "lucide-react";
+import { cn } from "../../utils/cn";
 
-const MobileHeader = ({ onOpenSidebar, activeNoteId, onLogoClick }) => {
+const MobileHeader = ({
+  onOpenSidebar,
+  activeNoteId,
+  onLogoClick,
+  onCreateNote,
+}) => {
   return (
-    <div className="lg:hidden h-14 border-b border-border bg-background/50 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
+    <div className="lg:hidden h-14 border-b border-border bg-background flex items-center justify-between px-6 shrink-0 relative z-50">
       <div className="flex items-center gap-4">
         <button
           onClick={onOpenSidebar}
@@ -19,10 +25,19 @@ const MobileHeader = ({ onOpenSidebar, activeNoteId, onLogoClick }) => {
           </h2>
         </button>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         {activeNoteId && (
           <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
         )}
+        <button
+          onClick={onCreateNote}
+          className={cn(
+            "px-4 py-2 bg-brand-primary hover:bg-brand-hover text-white rounded-xl active:scale-90 transition-all cursor-pointer shrink-0",
+            "text-[9px] font-black uppercase tracking-[0.2em] font-['Outfit'] shadow-lg shadow-brand-primary/30",
+          )}
+        >
+          + New Note
+        </button>
       </div>
     </div>
   );

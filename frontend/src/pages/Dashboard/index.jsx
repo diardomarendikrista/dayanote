@@ -303,6 +303,7 @@ const Dashboard = () => {
           onOpenSidebar={() => setIsSidebarOpen(true)}
           onLogoClick={handleLogoClick}
           activeNoteId={activeNoteId}
+          onCreateNote={() => setIsCreateModalOpen(true)}
         />
 
         {activeNoteId ? (
@@ -334,7 +335,9 @@ const Dashboard = () => {
           </>
         ) : (
           <EmptyState
-            notes={notes}
+            notes={filteredNotes}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
             onSelectNote={(id) => {
               const isReturningFromHome = !activeNoteId;
               setSearchParams({ note: id }, { replace: !isReturningFromHome });

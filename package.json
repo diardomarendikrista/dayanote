@@ -1,6 +1,6 @@
 {
   "name": "dayanote",
-  "version": "1.4.1",
+  "version": "1.4.3",
   "description": "Unified Dayanote Smart System",
   "main": "index.js",
   "scripts": {

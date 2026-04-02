@@ -139,27 +139,47 @@ exports.updateNote = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, isPublic, publicRole } = req.body;
-    const note = await prisma.note.findUnique({ where: { id } });
-    if (note.ownerId !== req.user.id) return res.status(403).json({ error: 'Unauthorized' });
+    const note = await prisma.note.findUnique({
+      where: { id },
+      include: { permissions: { where: { userId: req.user.id } } },
+    });
+
+    if (!note) return res.status(404).json({ error: 'Note not found' });
+
+    // Access logic: OWNER or EDITOR
+    const isOwner = note.ownerId === req.user.id;
+    const userPermission = note.permissions[0];
+    const isEditor = userPermission && userPermission.role === 'EDITOR';
+
+    if (!isOwner && !isEditor) {
+      return res.status(403).json({ error: 'You do not have permission to edit this note' });
+    }
+
+    // Role-based field filtering
+    const updateData = { title, content };
+
+    // Only OWNER can modify sharing settings
+    if (isOwner) {
+      if (typeof isPublic !== 'undefined') updateData.isPublic = isPublic;
+      if (publicRole) updateData.publicRole = publicRole;
+    }
 
     const updatedNote = await prisma.note.update({
       where: { id },
-      data: { title, content, isPublic, publicRole },
+      data: updateData,
     });
 
-    // If made private, we might need to kick anonymous or unauthorized users.
-    // For now, let's at least broadcast the update to the note room.
+    // Broadcast update
     const io = getIO(req);
     if (io) {
       io.to(`note_${id}`).emit('note_updated', updatedNote);
 
-      if (isPublic === false || publicRole !== note.publicRole) {
-        // Force re-verification for any privacy or role change
+      if (isOwner && (isPublic === false || (publicRole && publicRole !== note.publicRole))) {
         io.to(`note_${id}`).emit('check_access', { noteId: id });
       }
     }
 
-    res.json({ ...updatedNote, role: 'OWNER' });
+    res.json({ ...updatedNote, role: isOwner ? 'OWNER' : (userPermission?.role || 'VIEWER') });
   } catch (error) {
     res.status(400).json({ error: 'Failed to update note: ' + error.message });
   }

@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.4.3] - 2026-04-02
+### Fixed
+- **Permission Elevation**: Resolved an issue where collaborators with the `EDITOR` role were incorrectly restricted from updating note titles (403 Forbidden). Editors now have full title/content editing rights.
+- **Security**: Added strict server-side checks to ensure only the `OWNER` can modify sensitive note settings like `isPublic` and `publicRole`.
+
+## [1.4.2] - 2026-04-02
+### Added
+- **Mobile Dashboard Refactor**: Integrated a full notes directory directly into the Dashboard welcome screen for mobile users.
+- **Persistent Search**: Added a real-time search bar to the mobile dashboard for faster note filtering.
+- **Native Header Actions**: Moved the "Create New Note" button to the mobile navbar for immediate accessibility.
+- **Root Management**: Created a root `package.json` to manage Backend and Frontend with unified scripts (`npm run dev`).
+
+### Changed
+- **Editor UX**: Tightened `line-height` and paragraph margins in the editor for a more compact and mobile-friendly writing experience.
+- **Architecture**: Centralized versioning in the root `package.json` to prevent redundant builds of the backend/frontend sub-modules.
+
 ## [1.4.1] - 2026-04-02
 ### Fixed
 - Fixed "Cannot read properties of undefined (reading 'name')" error when opening shared notes via deep link.
