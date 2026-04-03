@@ -65,6 +65,7 @@ body {
 .gradient-text {
   background: linear-gradient(to right, var(--color-brand-primary), #dc2626);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -144,11 +145,12 @@ body {
 }
 
 .ProseMirror strong {
-  color: #fff;
+  color: inherit;
+  font-weight: 700;
 }
 
 .ProseMirror em {
-  color: #d6d3d1;
+  color: inherit;
   font-style: italic;
 }
 
@@ -185,10 +187,10 @@ body {
 }
 
 .ProseMirror blockquote {
-  border-left: 3px solid #a81c1c;
+  border-left: 3px solid var(--brand-primary);
   padding-left: 1rem;
   margin: 1em 0;
-  color: #78716c;
+  color: var(--muted-foreground);
   font-style: italic;
 }
 

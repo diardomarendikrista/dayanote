@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file. Versioning 
 
 ---
 
+## [0.3.1] - 2026-04-03
+### Changed
+- **Dynamic Theme Support**: Added adaptive UI support to the public `NotePage`, allowing it to toggle between light and dark modes to match user preference.
+- **Improved Bold Visibility**: Fixed an issue where bold text was hardcoded to white, making it invisible in light mode. Now inherits contrast-aware colors from the active theme.
+
+### Added
+- **NotePage Theme Toggle**: Integrated a theme switcher directly into the `NotePage` header for quick accessibility on public/shared links.
+
 ## [0.3.0] - 2026-04-02
 ### Added
 - **Note Status Indicators**: Integrated visual icons (Lock, Globe, Users) to distinguish between Private, Public, and Shared notes at a glance.
@@ -48,6 +56,7 @@ All notable changes to this project will be documented in this file. Versioning 
 - **Initial Release (MVP)**: Core architecture using Express, Prisma, React, and Tailwind CSS.
 - **Collaboration Suite**: Built-in Yjs and Tiptap integration for real-time multiplayer editing and permission-based sharing.
 
+[0.3.1]: https://github.com/diardomarendikrista/dayanote/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/diardomarendikrista/dayanote/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/diardomarendikrista/dayanote/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/diardomarendikrista/dayanote/compare/v0.2.2...v0.2.3

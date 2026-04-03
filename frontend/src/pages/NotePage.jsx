@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import CollaborativeEditor from "../components/CollaborativeEditor";
 import { useAppStore } from "../store/useAppStore";
-import { FileText, LogIn, Eye, Edit3, Globe } from "lucide-react";
+import { FileText, LogIn, Eye, Edit3, Globe, Sun, Moon } from "lucide-react";
 import { cn } from "../utils/cn";
 import { io } from "socket.io-client";
 import { useRef } from "react";
@@ -12,7 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
 
 const NotePage = () => {
   const { id } = useParams();
-  const { token } = useAppStore();
+  const { token, theme, toggleTheme } = useAppStore();
   const [note, setNote] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -77,13 +77,13 @@ const NotePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0c0a09] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <div className="absolute inset-0 bg-[#a81c1c]/20 blur-xl rounded-full" />
             <div className="w-12 h-12 border-2 border-[#a81c1c] border-t-transparent rounded-full animate-spin relative z-10" />
           </div>
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-stone-500 animate-pulse font-['Outfit']">
+          <p className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse font-['Outfit']">
             Retrieving Note...
           </p>
         </div>
@@ -93,19 +93,19 @@ const NotePage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0c0a09] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="text-center space-y-8 max-w-sm">
           <div className="relative group mx-auto w-fit">
             <div className="absolute inset-0 bg-[#a81c1c]/10 blur-2xl rounded-full transition-all group-hover:bg-[#a81c1c]/20" />
-            <div className="relative w-24 h-24 bg-[#1c1917] border border-stone-800 rounded-[2.5rem] flex items-center justify-center text-[#a81c1c] shadow-2xl rotate-6 group-hover:rotate-0 transition-transform duration-500">
+            <div className="relative w-24 h-24 bg-card border border-border rounded-[2.5rem] flex items-center justify-center text-[#a81c1c] shadow-2xl rotate-6 group-hover:rotate-0 transition-transform duration-500">
               <FileText size={40} />
             </div>
           </div>
           <div className="space-y-4">
-            <h2 className="text-3xl font-black text-white uppercase tracking-tighter font-['Outfit']">
+            <h2 className="text-3xl font-black text-foreground uppercase tracking-tighter font-['Outfit']">
               Restricted
             </h2>
-            <p className="text-stone-500 text-xs font-black uppercase tracking-[0.2em] leading-relaxed font-['Outfit']">
+            <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.2em] leading-relaxed font-['Outfit']">
               {error}
             </p>
           </div>
@@ -118,7 +118,7 @@ const NotePage = () => {
             </Link>
             <Link
               to="/dashboard"
-              className="px-8 py-4 bg-stone-900 border border-stone-800 hover:border-stone-600 text-stone-400 hover:text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all font-['Outfit']"
+              className="px-8 py-4 bg-muted border border-border hover:border-brand-primary text-muted-foreground hover:text-foreground rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all font-['Outfit']"
             >
               Return to Base
             </Link>
@@ -131,21 +131,21 @@ const NotePage = () => {
   const isReadOnly = note.role === "VIEWER";
 
   return (
-    <div className="min-h-screen bg-[#0c0a09] font-['Inter'] text-stone-300">
+    <div className="min-h-screen bg-background font-['Inter'] text-foreground">
       {/* Top Bar */}
-      <div className="h-16 md:h-24 border-b border-stone-800/80 flex items-center justify-between px-6 md:px-12 bg-[#0c0a09]/80 sticky top-0 z-50 backdrop-blur-xl">
+      <div className="h-14 md:h-16 md:h-24 border-b border-border flex items-center justify-between px-6 md:px-12 bg-background/80 sticky top-0 z-50 backdrop-blur-xl">
         <div className="flex items-center gap-4 md:gap-8 min-w-0">
           <Link
             to="/dashboard"
-            className="text-xl md:text-2xl font-black tracking-tighter text-white hover:opacity-80 transition-opacity shrink-0"
+            className="text-xl md:text-2xl font-black tracking-tighter text-foreground hover:opacity-80 transition-opacity shrink-0"
           >
             DAYA<span className="text-brand-primary">NOTE</span>
           </Link>
-          <div className="w-px h-6 bg-stone-800 shrink-0 hidden md:block" />
+          <div className="w-px h-6 bg-border shrink-0 hidden md:block" />
           <div className="hidden md:flex items-center gap-4 overflow-hidden">
             <div
               className={cn(
-                "p-2 rounded-lg bg-stone-900 border flex items-center gap-2 shrink-0 transition-all",
+                "p-2 rounded-lg bg-muted border flex items-center gap-2 shrink-0 transition-all",
                 !isReadOnly
                   ? "text-emerald-500 border-emerald-500/20"
                   : "text-[#a81c1c] border-[#a81c1c]/20",
@@ -156,7 +156,7 @@ const NotePage = () => {
                 {isReadOnly ? "View Only" : "Editor Access"}
               </span>
             </div>
-            <h1 className="text-lg font-black text-white uppercase tracking-tighter truncate min-w-0 font-['Outfit']">
+            <h1 className="text-lg font-black text-foreground uppercase tracking-tighter truncate min-w-0 font-['Outfit']">
               {note?.title || "Untitled Note"}
             </h1>
           </div>
@@ -167,14 +167,14 @@ const NotePage = () => {
             <span className="text-[10px] font-black text-[#a81c1c] uppercase tracking-[0.2em] font-['Outfit']">
               Originator
             </span>
-            <span className="text-xs font-black text-white uppercase tracking-widest font-['Outfit']">
+            <span className="text-xs font-black text-foreground uppercase tracking-widest font-['Outfit']">
               {note.owner?.name}
             </span>
           </div>
           {token ? (
             <Link
               to="/dashboard"
-              className="px-6 py-3 bg-stone-900 border border-stone-800 hover:border-[#a81c1c]/50 text-stone-400 hover:text-white rounded-xl text-xs font-black uppercase tracking-[0.2em] transition-all shadow-lg shadow-black/40 font-['Outfit']"
+              className="px-6 py-3 bg-muted border border-border hover:border-[#a81c1c]/50 text-muted-foreground hover:text-foreground rounded-xl text-xs font-black uppercase tracking-[0.2em] transition-all shadow-lg shadow-black/40 font-['Outfit']"
             >
               Open Dashboard
             </Link>
@@ -187,11 +187,19 @@ const NotePage = () => {
               <span className="hidden sm:block">Secure Login</span>
             </Link>
           )}
+
+          <button
+            onClick={toggleTheme}
+            className="p-3 bg-muted border border-border hover:border-brand-primary/50 text-muted-foreground hover:text-brand-primary rounded-xl transition-all shadow-lg font-['Outfit']"
+            title="Toggle Theme"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
         </div>
       </div>
 
       {/* Hero Header Area */}
-      <div className="bg-[#12100f] border-b border-stone-800/50 pt-8 md:pt-16 pb-4 md:pb-8">
+      <div className="bg-muted/30 border-b border-border pt-4 md:pt-16 pb-4 md:pb-8">
         <div className="max-w-5xl mx-auto px-4 md:px-12">
           <div className="md:space-y-6">
             <div className="flex items-center gap-3">
@@ -199,28 +207,28 @@ const NotePage = () => {
                 size={14}
                 className="text-emerald-500"
               />
-              <span className="text-xs font-black uppercase tracking-[0.3em] text-emerald-500/80 font-['Outfit']">
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-emerald-500/80 font-['Outfit']">
                 Public Secure Link Active
               </span>
             </div>
-            <h2 className="text-6xl font-black text-white uppercase tracking-tighter leading-none font-['Outfit']">
+            <h2 className="text-4xl md:text-6xl font-black text-foreground uppercase tracking-tighter leading-none font-['Outfit']">
               {note?.title || "Note"}
             </h2>
             <div className="flex items-center gap-8 pt-2">
               <div>
-                <p className="text-[10px] font-black text-stone-600 uppercase tracking-[0.2em] font-['Outfit']">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] font-['Outfit']">
                   Issue Date
                 </p>
-                <p className="text-xs font-bold text-stone-400 font-['Outfit']">
+                <p className="text-xs font-bold text-muted-foreground font-['Outfit']">
                   {new Date(note?.createdAt).toLocaleDateString()}
                 </p>
               </div>
-              <div className="w-px h-8 bg-stone-800/50" />
+              <div className="w-px h-8 bg-border" />
               <div>
-                <p className="text-[10px] font-black text-stone-600 uppercase tracking-[0.2em] font-['Outfit']">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] font-['Outfit']">
                   Originator
                 </p>
-                <p className="text-xs font-bold text-stone-400 font-['Outfit']">
+                <p className="text-xs font-bold text-muted-foreground font-['Outfit']">
                   {note.owner?.name}
                 </p>
               </div>
@@ -230,10 +238,10 @@ const NotePage = () => {
       </div>
 
       {/* Editor Content Area */}
-      <div className="max-w-5xl mx-auto px-0 md:px-8 pb-32 pt-12">
-        <div className="bg-[#12100f] border border-stone-800/50 rounded-[3rem] p-4 md:p-8 shadow-2xl relative">
+      <div className="max-w-5xl mx-auto px-0 md:px-8 pb-32 pt-5 md:pt-12">
+        <div className="bg-card border border-border rounded-[3rem] p-4 md:p-8 shadow-2xl relative">
           <div className="absolute top-8 right-12 z-10 pointer-events-none">
-            <div className="text-[60px] font-black text-white/[0.02] uppercase tracking-tighter leading-none select-none">
+            <div className="text-[60px] font-black text-foreground/[0.02] uppercase tracking-tighter leading-none select-none">
               {isReadOnly ? "RESTRICTED" : "AUTHORIZED"}
             </div>
           </div>
@@ -245,16 +253,16 @@ const NotePage = () => {
         </div>
 
         {/* Footer Meta */}
-        <div className="mt-12 flex justify-between items-center text-stone-600 px-4 md:px-0 flex-wrap gap-4">
+        <div className="mt-12 flex justify-between items-center text-muted-foreground px-4 md:px-0 flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-stone-900 border border-stone-800 flex items-center justify-center font-black text-xs">
+            <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center font-black text-xs">
               DN
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest leading-none font-['Outfit']">
                 Note Identifier
               </p>
-              <p className="text-[11px] font-mono mt-1 text-stone-500">
+              <p className="text-[11px] font-mono mt-1 text-muted-foreground">
                 {note.id}
               </p>
             </div>

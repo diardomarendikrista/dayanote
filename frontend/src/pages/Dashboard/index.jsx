@@ -59,8 +59,14 @@ const Dashboard = () => {
 
     socket.on("title_updated", ({ noteId, title }) => {
       setNotes((prev) => {
-        const updated = prev.map((n) => (n.id === noteId ? { ...n, title, updatedAt: new Date().toISOString() } : n));
-        return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        const updated = prev.map((n) =>
+          n.id === noteId
+            ? { ...n, title, updatedAt: new Date().toISOString() }
+            : n,
+        );
+        return [...updated].sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+        );
       });
     });
 
@@ -102,7 +108,9 @@ const Dashboard = () => {
         const updated = prev.map((n) =>
           n.id === updatedNote.id ? { ...n, ...updatedNote } : n,
         );
-        return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        return [...updated].sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+        );
       });
     });
 
@@ -113,8 +121,12 @@ const Dashboard = () => {
             headers: { Authorization: `Bearer ${token}` },
           });
           setNotes((prev) => {
-            const updated = prev.map((n) => (n.id === noteId ? { ...n, ...res.data } : n));
-            return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            const updated = prev.map((n) =>
+              n.id === noteId ? { ...n, ...res.data } : n,
+            );
+            return [...updated].sort(
+              (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+            );
           });
         } catch (err) {
           if (err.response?.status === 403) {
@@ -210,8 +222,12 @@ const Dashboard = () => {
             { headers: { Authorization: `Bearer ${token}` } },
           );
           setNotes((prev) => {
-            const updated = prev.map((n) => (n.id === noteId ? { ...n, ...res.data } : n));
-            return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            const updated = prev.map((n) =>
+              n.id === noteId ? { ...n, ...res.data } : n,
+            );
+            return [...updated].sort(
+              (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+            );
           });
           setSaveStatus("saved");
           setTimeout(() => setSaveStatus("idle"), 2000);
@@ -238,7 +254,9 @@ const Dashboard = () => {
           ? { ...n, title: newTitle, updatedAt: new Date().toISOString() }
           : n,
       );
-      return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      return [...updated].sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+      );
     });
 
     // Broadcast in real-time via Socket.io
@@ -263,8 +281,12 @@ const Dashboard = () => {
 
   const updateActiveNoteInList = (updatedNote) => {
     setNotes((prev) => {
-      const updated = prev.map((n) => (n.id === updatedNote.id ? updatedNote : n));
-      return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      const updated = prev.map((n) =>
+        n.id === updatedNote.id ? updatedNote : n,
+      );
+      return [...updated].sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+      );
     });
   };
 
@@ -283,7 +305,9 @@ const Dashboard = () => {
           : n,
       );
       // Only sort if the order actually changed significantly (optimistic)
-      return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      return [...updated].sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+      );
     });
   }, [activeNoteId]);
 

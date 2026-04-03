@@ -142,7 +142,7 @@ const EmptyState = ({
 
           {/* Label Credit (Desktop Only) */}
           <p className="hidden lg:block text-[9px] font-black text-stone-700 uppercase tracking-[0.3em] pt-4">
-            Daya Note Intelligence System &copy; 2026
+            Daya Note &copy; 2026
           </p>
         </div>
       </div>
