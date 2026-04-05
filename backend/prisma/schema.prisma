@@ -1,45 +1,51 @@
+/// Prisma generator configuration
 generator client {
   provider = "prisma-client-js"
 }
 
+/// Database connection configuration
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+/// Represents a user in the system
 model User {
   id          String       @id @default(uuid())
   email       String       @unique
-  password    String?
+  password    String?      /// Hashed password. Can be null for admin-reset users.
   name        String?
-  notes       Note[]
-  permissions Permission[]
+  notes       Note[]       /// Notes owned by this user
+  permissions Permission[] /// Additional permissions granted to this user
 }
 
+/// Represents a collaborative note
 model Note {
   id          String       @id @default(uuid())
   title       String
-  content     Json?
-  isPublic    Boolean      @default(false)
-  publicRole  Role         @default(VIEWER)
+  content     Json?        /// Hex string representing the Y.js document state
+  isPublic    Boolean      @default(false) /// Whether the note can be accessed by anyone with the link
+  publicRole  Role         @default(VIEWER) /// Role assigned to public visitors
   ownerId     String
   owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  permissions Permission[]
+  permissions Permission[] /// Explicit permissions granted to other users
 }
 
+/// Represents explicit permissions granted to a user for a specific note
 model Permission {
   id     String @id @default(uuid())
   userId String
   noteId String
-  role   Role   @default(VIEWER)
+  role   Role   @default(VIEWER) /// Role (VIEWER/EDITOR)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
 
   @@unique([userId, noteId])
 }
 
+/// Available roles for note access
 enum Role {
   VIEWER
   EDITOR

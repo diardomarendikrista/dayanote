@@ -1,6 +1,22 @@
+/**
+ * @fileoverview Mobile-specific header component for the Dashboard.
+ * Provides access to the sidebar menu, home navigation, and quick note creation on smaller screens.
+ */
+
 import { Menu, Plus } from "lucide-react";
 import { cn } from "../../utils/cn";
 
+/**
+ * MobileHeader component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {Function} props.onOpenSidebar - Callback to open the navigation sidebar.
+ * @param {string} [props.activeNoteId] - ID of the currently active note, if any.
+ * @param {Function} props.onLogoClick - Callback for clicking the logo/home link.
+ * @param {Function} props.onCreateNote - Callback to initiate new note creation.
+ * @returns {React.ReactElement}
+ */
 const MobileHeader = ({
   onOpenSidebar,
   activeNoteId,

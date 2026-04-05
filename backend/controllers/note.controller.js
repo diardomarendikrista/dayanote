@@ -1,9 +1,25 @@
+/**
+ * @fileoverview Note controller handling CRUD operations and permissions for notes.
+ * Integrates with Prisma for database access and Socket.io for real-time updates.
+ */
+
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Helper to get Socket.io from request
+/**
+ * Helper function to retrieve the Socket.io instance from the Express app.
+ * @param {Object} req - Express request object.
+ * @returns {Object|null} Socket.io instance or null if not found.
+ */
 const getIO = (req) => req.app.get('io');
 
+/**
+ * Fetches all notes owned by or shared with the authenticated user.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.user - Authenticated user info.
+ * @param {Object} res - Express response object.
+ */
 exports.getNotes = async (req, res) => {
   try {
     const notes = await prisma.note.findMany({
@@ -20,7 +36,9 @@ exports.getNotes = async (req, res) => {
       orderBy: { updatedAt: 'desc' },
     });
 
-    // Map to include role
+    /**
+     * Map notes to include the specific role of the requesting user.
+     */
     const notesWithRole = notes.map(note => {
       let role = 'VIEWER';
       if (note.ownerId === req.user.id) role = 'OWNER';
@@ -34,6 +52,14 @@ exports.getNotes = async (req, res) => {
   }
 };
 
+/**
+ * Creates a new note for the authenticated user.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.body - Request body.
+ * @param {string} [req.body.title] - Optional title for the note.
+ * @param {Object} res - Express response object.
+ */
 exports.createNote = async (req, res) => {
   try {
     const { title } = req.body;
@@ -49,6 +75,13 @@ exports.createNote = async (req, res) => {
   }
 };
 
+/**
+ * Fetches a single note by ID, verifying access permissions.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {string} req.params.id - Note ID.
+ * @param {Object} res - Express response object.
+ */
 exports.getNote = async (req, res) => {
   try {
     const { id } = req.params;
@@ -63,7 +96,9 @@ exports.getNote = async (req, res) => {
 
     if (!note) return res.status(404).json({ error: 'Note not found' });
 
-    // Access check: Owner OR Public OR has explicit Permission
+    /**
+     * Access check: Owner OR Public OR has explicit Permission.
+     */
     const isOwner = req.user && note.ownerId === req.user.id;
     const hasPermission = req.user && note.permissions.some(p => p.userId === req.user.id);
 
@@ -71,7 +106,9 @@ exports.getNote = async (req, res) => {
       return res.status(403).json({ error: 'Access restricted' });
     }
 
-    // Determine role for the response
+    /**
+     * Determine user role for the response.
+     */
     let role = 'VIEWER';
     if (isOwner) role = 'OWNER';
     else if (hasPermission) role = note.permissions.find(p => p.userId === req.user.id).role;
@@ -83,6 +120,15 @@ exports.getNote = async (req, res) => {
   }
 };
 
+/**
+ * Grants permission (EDITOR/VIEWER) to another user for a specific note.
+ * Only owners can perform this action.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {string} req.params.id - Note ID.
+ * @param {Object} req.body - Request body (email, role).
+ * @param {Object} res - Express response object.
+ */
 exports.addPermission = async (req, res) => {
   try {
     const { id } = req.params; // note id
@@ -101,7 +147,9 @@ exports.addPermission = async (req, res) => {
       create: { userId: targetUser.id, noteId: id, role },
     });
 
-    // Notify target user
+    /**
+     * Notify the target user of their updated access level via Socket.io.
+     */
     const io = getIO(req);
     if (io) {
       io.to(`user_${targetUser.id}`).emit('access_changed', { noteId: id, role });
@@ -113,6 +161,15 @@ exports.addPermission = async (req, res) => {
   }
 };
 
+/**
+ * Removes access for a user from a specific note.
+ * Only owners can perform this action.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {string} req.params.id - Note ID.
+ * @param {string} req.params.userId - ID of the user to remove access for.
+ * @param {Object} res - Express response object.
+ */
 exports.removePermission = async (req, res) => {
   try {
     const { id, userId } = req.params;
@@ -123,7 +180,9 @@ exports.removePermission = async (req, res) => {
       where: { userId_noteId: { userId, noteId: id } },
     });
 
-    // Notify target user that access is revoked
+    /**
+     * Notify the target user that their access has been revoked.
+     */
     const io = getIO(req);
     if (io) {
       io.to(`user_${userId}`).emit('access_revoked', { noteId: id });
@@ -135,6 +194,15 @@ exports.removePermission = async (req, res) => {
   }
 };
 
+/**
+ * Updates a note's title, content, or sharing settings.
+ * Validates edit permissions (OWNER, EDITOR).
+ * 
+ * @param {Object} req - Express request object.
+ * @param {string} req.params.id - Note ID.
+ * @param {Object} req.body - Update fields (title, content, isPublic, publicRole).
+ * @param {Object} res - Express response object.
+ */
 exports.updateNote = async (req, res) => {
   try {
     const { id } = req.params;
@@ -147,7 +215,9 @@ exports.updateNote = async (req, res) => {
 
     if (!note) return res.status(404).json({ error: "Note not found" });
 
-    // Access determination (matching getNote logic)
+    /**
+     * Access determination: Determine if the user has EDIT rights.
+     */
     const isOwner = note.ownerId === req.user.id;
     const userPermission = note.permissions[0];
     const isExplicitEditor = userPermission && userPermission.role === "EDITOR";
@@ -160,12 +230,16 @@ exports.updateNote = async (req, res) => {
       return res.status(403).json({ error: "You do not have permission to edit this note" });
     }
 
-    // Prepare update data carefully
+    /**
+     * Prepare update data carefully.
+     */
     const updateData = {};
     if (typeof title !== "undefined") updateData.title = title;
     if (typeof content !== "undefined") updateData.content = content;
 
-    // Only OWNER can modify core sharing settings
+    /**
+     * Only the OWNER can modify core sharing settings (isPublic, publicRole).
+     */
     if (isOwner) {
       if (typeof isPublic !== "undefined") updateData.isPublic = isPublic;
       if (typeof publicRole !== "undefined") updateData.publicRole = publicRole;
@@ -176,11 +250,16 @@ exports.updateNote = async (req, res) => {
       data: updateData,
     });
 
-    // Broadcast update
+    /**
+     * Broadcast the update to all connected users in the note's room via Socket.io.
+     */
     const io = getIO(req);
     if (io) {
       io.to(`note_${id}`).emit("note_updated", updatedNote);
 
+      /**
+       * If sharing settings changed, trigger an access check for connected clients.
+       */
       if (isOwner && (isPublic === false || (publicRole && publicRole !== note.publicRole))) {
         io.to(`note_${id}`).emit("check_access", { noteId: id });
       }
@@ -196,11 +275,21 @@ exports.updateNote = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a note by ID.
+ * Only the owner can delete a note.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {string} req.params.id - Note ID.
+ * @param {Object} res - Express response object.
+ */
 exports.deleteNote = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Notify all collaborators/viewers in the room
+    /**
+     * Notify all collaborators/viewers in the room that the note will be deleted.
+     */
     const io = getIO(req);
     if (io) {
       io.to(`note_${id}`).emit('note_deleted', { noteId: id });

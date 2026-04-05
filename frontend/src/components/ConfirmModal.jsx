@@ -1,7 +1,28 @@
+/**
+ * @fileoverview A confirmation modal component for critical actions.
+ * Provides a consistent UI for confirming destructive or significant actions.
+ */
+
 import Modal from "./Modal";
 import { cn } from "../utils/cn";
 import { AlertCircle, Trash2, LogOut } from "lucide-react";
 
+/**
+ * ConfirmModal component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Whether the modal is visible.
+ * @param {Function} props.onClose - Callback to close the modal.
+ * @param {Function} props.onConfirm - Callback triggered when the confirm button is clicked.
+ * @param {string} props.title - Title text of the modal.
+ * @param {string} props.message - Descriptive message for the user.
+ * @param {string} [props.confirmText="Confirm Action"] - Label for the confirmation button.
+ * @param {string} [props.cancelText="Cancel"] - Label for the cancel button.
+ * @param {string} [props.variant="primary"] - Visual style variant ('primary' or 'danger').
+ * @param {string} [props.icon="alert"] - Icon to display ('alert', 'trash', or 'logout').
+ * @param {boolean} [props.loading=false] - Whether the modal is in a loading state.
+ */
 const ConfirmModal = ({
   isOpen,
   onClose,
@@ -14,6 +35,10 @@ const ConfirmModal = ({
   icon = "alert", // 'alert', 'trash', 'logout'
   loading = false,
 }) => {
+  /**
+   * Helper to determine which icon to display based on the `icon` prop.
+   * @returns {React.ReactElement}
+   */
   const getIcon = () => {
     switch (icon) {
       case "trash":
@@ -25,6 +50,9 @@ const ConfirmModal = ({
     }
   };
 
+  /**
+   * Footer content containing the action buttons.
+   */
   const footer = (
     <>
       <button

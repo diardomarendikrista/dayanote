@@ -1,7 +1,29 @@
+/**
+ * @fileoverview Header component for the active note view in the Dashboard.
+ * Displays the note title (editable by owners/editors), save status indicators,
+ * sharing controls, and deletion options.
+ */
+
 import { Check, Share2, Trash2 } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { toast } from "../../components/Toast";
 
+/**
+ * Header component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {Object} props.activeNote - The currently active note object.
+ * @param {Function} props.onTitleChange - Callback for title input changes.
+ * @param {Function} props.onTitleFocus - Callback for title input focus.
+ * @param {Function} props.onTitleBlur - Callback for title input blur (triggering save).
+ * @param {boolean} props.canEdit - Whether the current user has edit permissions.
+ * @param {string} props.saveStatus - Current save state ('idle', 'saving', 'saved').
+ * @param {Function} props.onOpenShareModal - Callback to open the note sharing modal.
+ * @param {Function} props.onDeleteNote - Callback to initiate note deletion.
+ * @param {Function} props.onLogoClick - Callback for clicking the dashboard logo/home link.
+ * @returns {React.ReactElement}
+ */
 const Header = ({
   activeNote,
   onTitleChange,

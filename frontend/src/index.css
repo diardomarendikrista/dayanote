@@ -1,5 +1,14 @@
+/*
+ * Global CSS styles and theme configurations.
+ * Uses Tailwind CSS and custom CSS variables for theme management.
+ */
+
 @import "tailwindcss";
 
+/* 
+ * Tailwind Theme extension.
+ * Maps standard Tailwind color names to custom CSS variables.
+ */
 @theme {
   --color-brand-primary: var(--brand-primary);
   --color-brand-secondary: #7f1d1d;
@@ -14,6 +23,9 @@
   --color-muted-foreground: var(--muted-foreground);
 }
 
+/* 
+ * Light Theme variables (Root).
+ */
 :root {
   --background: #ffffff;
   --foreground: #09090b;
@@ -28,6 +40,9 @@
   --brand-hover: #991b1b;
 }
 
+/* 
+ * Dark Theme variables.
+ */
 .dark {
   --background: #0c0a09; /* Stone 950 / Black */
   --foreground: #f5f5f4;
@@ -40,6 +55,9 @@
   --muted-foreground: #78716c;
 }
 
+/* 
+ * Global element styles.
+ */
 body {
   background: var(--background);
   color: var(--foreground);
@@ -49,7 +67,11 @@ body {
     color 0.3s ease;
 }
 
-/* Custom Utilities */
+/* 
+ * Custom Utilities 
+ */
+
+/* Glassmorphism effect */
 .glass {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(16px);
@@ -62,6 +84,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Gradient text with brand primary color */
 .gradient-text {
   background: linear-gradient(to right, var(--color-brand-primary), #dc2626);
   -webkit-background-clip: text;
@@ -73,7 +96,9 @@ body {
   border-color: var(--color-brand-primary);
 }
 
-/* Animations */
+/* 
+ * Animations 
+ */
 @keyframes float {
   0% {
     transform: translateY(0px);
@@ -90,7 +115,9 @@ body {
   animation: float 6s ease-in-out infinite;
 }
 
-/* Custom scrollbar */
+/* 
+ * Custom scrollbar for desktop browsers.
+ */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
@@ -108,7 +135,10 @@ body {
   background: rgba(168, 28, 28, 0.5);
 }
 
-/* TipTap Editor Typography */
+/* 
+ * TipTap Editor (ProseMirror) Typography.
+ * These styles specifically target the content inside the collaborative editor.
+ */
 .ProseMirror {
   color: var(--foreground);
   font-size: 1rem;
@@ -204,6 +234,7 @@ body {
   margin: 0.25em 0;
 }
 
+/* Task list styles within the editor */
 .ProseMirror ul[data-type="taskList"] {
   list-style: none;
   padding-left: 0;
@@ -230,6 +261,7 @@ body {
   margin: 1.5em 0;
 }
 
+/* Editor placeholder styling */
 .ProseMirror p.is-empty::before {
   content: attr(data-placeholder);
   color: #44403c;

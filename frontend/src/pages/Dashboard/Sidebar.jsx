@@ -1,8 +1,35 @@
+/**
+ * @fileoverview Sidebar component for the Dashboard.
+ * Contains the application logo, theme toggle, search bar,
+ * note list, and user profile information.
+ */
+
 import { Sun, Moon, X, Plus } from "lucide-react";
 import { cn } from "../../utils/cn";
 import NoteItem from "./NoteItem";
 import UserProfile from "./UserProfile";
 
+/**
+ * Sidebar component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Whether the sidebar is visible (mobile).
+ * @param {Function} props.onClose - Callback to close the sidebar (mobile).
+ * @param {string} props.theme - Current application theme ('light' or 'dark').
+ * @param {Function} props.onToggleTheme - Callback to toggle the theme.
+ * @param {string} props.searchTerm - Current search filter for notes.
+ * @param {Function} props.onSearchChange - Callback for search input changes.
+ * @param {Array} props.filteredNotes - List of notes to display after filtering.
+ * @param {string} [props.activeNoteId] - ID of the currently selected note.
+ * @param {Function} props.onSelectNote - Callback for selecting a note.
+ * @param {Function} props.onCreateNote - Callback to initiate new note creation.
+ * @param {Object} props.user - The current user object.
+ * @param {Function} props.onLogout - Callback to initiate logout.
+ * @param {Function} props.onOpenSettings - Callback to open user settings.
+ * @param {Function} props.onLogoClick - Callback for clicking the logo/home link.
+ * @returns {React.ReactElement}
+ */
 const Sidebar = ({
   isOpen,
   onClose,

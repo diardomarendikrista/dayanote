@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Main Dashboard component.
+ * Serves as the central hub for the application, managing:
+ * - Note lifecycle (CRUD)
+ * - Real-time synchronization via Socket.io
+ * - Modal states for settings, creation, deletion, and sharing
+ * - Layout and navigation between notes
+ */
+
 import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -19,6 +28,12 @@ import EmptyState from "./EmptyState";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
 
+/**
+ * Dashboard component.
+ * 
+ * @component
+ * @returns {React.ReactElement}
+ */
 const Dashboard = () => {
   const { user, token, logout, theme, toggleTheme } = useAppStore();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -43,7 +58,10 @@ const Dashboard = () => {
   const titleSaveTimer = useRef(null);
   const socketRef = useRef(null);
 
-  // === Socket.io connection ===
+  /**
+   * Initializes and manages the Socket.io connection.
+   * Listens for real-time events like title updates, save status, access changes, and deletions.
+   */
   useEffect(() => {
     if (!token) return;
     const socket = io(API_URL, { auth: { token } });
@@ -141,7 +159,10 @@ const Dashboard = () => {
     return () => socket.disconnect();
   }, [token]);
 
-  // Sync socket rooms with available notes to ensure real-time sidebar updates
+  /**
+   * Keeps the user in sync with Socket.io rooms for all accessible notes.
+   * This ensures real-time updates for sidebar metadata.
+   */
   useEffect(() => {
     if (notes.length > 0 && socketRef.current) {
       const noteIds = notes.map((n) => n.id);
@@ -149,7 +170,10 @@ const Dashboard = () => {
     }
   }, [notes, token]); // Re-join if notes list changes
 
-  // === Notes CRUD ===
+  /**
+   * Fetches the complete list of notes accessible to the current user.
+   * @async
+   */
   const fetchNotes = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/notes`, {
@@ -161,10 +185,18 @@ const Dashboard = () => {
     }
   };
 
+  /**
+   * Initial fetch of notes on component mount or token update.
+   */
   useEffect(() => {
     if (token) fetchNotes();
   }, [token]);
 
+  /**
+   * Handles creation of a new note.
+   * @async
+   * @param {string} title - The title for the new note.
+   */
   const handleCreateNote = async (title) => {
     setIsCreatingNote(true);
     try {
@@ -184,6 +216,10 @@ const Dashboard = () => {
     }
   };
 
+  /**
+   * Handles deletion of a note after user confirmation.
+   * @async
+   */
   const handleConfirmDelete = async () => {
     if (!noteToDelete) return;
     setIsDeletingNote(true);
@@ -203,13 +239,20 @@ const Dashboard = () => {
     }
   };
 
+  /**
+   * Finalizes the logout process.
+   */
   const handleConfirmLogout = () => {
     logout();
     setIsLogoutModalOpen(false);
     toast.success("Logged out successfully.");
   };
 
-  // === Title auto-save with debounce ===
+  /**
+   * Debounced function to save note fields (e.g., title) to the server.
+   * @param {string} noteId - ID of the note to update.
+   * @param {Object} fields - Updated fields.
+   */
   const saveNoteFields = useCallback(
     (noteId, fields) => {
       if (titleSaveTimer.current) clearTimeout(titleSaveTimer.current);
@@ -242,10 +285,18 @@ const Dashboard = () => {
 
   const titleRef = useRef("");
 
+  /**
+   * Captures initial title on focus for change detection.
+   * @param {React.FocusEvent} e 
+   */
   const handleTitleFocus = (e) => {
     titleRef.current = e.target.value;
   };
 
+  /**
+   * Handles title updates in the UI and broadcasts changes via Socket.io.
+   * @param {React.ChangeEvent} e 
+   */
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
     setNotes((prev) => {
@@ -268,17 +319,28 @@ const Dashboard = () => {
     }
   };
 
+  /**
+   * Triggers the debounced API save when the title field loses focus.
+   * @param {React.FocusEvent} e 
+   */
   const handleTitleBlur = (e) => {
     const newTitle = e.target.value;
     if (newTitle === titleRef.current) return; // No change, skip API
     saveNoteFields(activeNoteId, { title: newTitle });
   };
 
+  /**
+   * Resets active note selection when clicking the main logo.
+   */
   const handleLogoClick = () => {
     setSearchParams({});
     setIsSidebarOpen(false);
   };
 
+  /**
+   * Callback for child components to update the local note list when a single note changes.
+   * @param {Object} updatedNote 
+   */
   const updateActiveNoteInList = (updatedNote) => {
     setNotes((prev) => {
       const updated = prev.map((n) =>
@@ -297,6 +359,10 @@ const Dashboard = () => {
   const activeNote = notes.find((n) => n.id === activeNoteId);
   const canEdit = activeNote?.role === "OWNER" || activeNote?.role === "EDITOR";
 
+  /**
+   * Updates `updatedAt` for the active note on content modification.
+   * This ensures the note moves to the top of the list.
+   */
   const handleBodyChange = useCallback(() => {
     setNotes((prev) => {
       const updated = prev.map((n) =>
@@ -345,12 +411,14 @@ const Dashboard = () => {
 
       {/* Main Area */}
       <div className="flex-1 flex flex-col relative z-10 bg-background min-w-0">
-        <MobileHeader
-          onOpenSidebar={() => setIsSidebarOpen(true)}
-          onLogoClick={handleLogoClick}
-          activeNoteId={activeNoteId}
-          onCreateNote={() => setIsCreateModalOpen(true)}
-        />
+        <div className="lg:hidden">
+          <MobileHeader
+            onOpenSidebar={() => setIsSidebarOpen(true)}
+            onLogoClick={handleLogoClick}
+            activeNoteId={activeNoteId}
+            onCreateNote={() => setIsCreateModalOpen(true)}
+          />
+        </div>
 
         {activeNoteId ? (
           <>

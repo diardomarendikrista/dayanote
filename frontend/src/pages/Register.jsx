@@ -1,9 +1,21 @@
+/**
+ * @fileoverview Registration page component.
+ * Allows new users to create an account by providing their name, email, and password.
+ * Redirects authenticated users to the dashboard.
+ */
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { cn } from "../utils/cn";
 import { useAppStore } from "../store/useAppStore";
 
+/**
+ * Register component.
+ * 
+ * @component
+ * @returns {React.ReactElement}
+ */
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,12 +24,21 @@ const Register = () => {
   const navigate = useNavigate();
   const { token } = useAppStore();
 
+  /**
+   * Redirect to dashboard if user is already authenticated.
+   */
   useEffect(() => {
     if (token) {
       navigate("/dashboard", { replace: true });
     }
   }, [token, navigate]);
 
+  /**
+   * Handles the registration form submission.
+   * Sends user data to the backend and redirects to the login page upon success.
+   * @async
+   * @param {React.FormEvent} e - Form event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

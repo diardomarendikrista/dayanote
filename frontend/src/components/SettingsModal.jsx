@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Modal component for managing user account settings.
+ * Includes tabs for profile synchronization (name) and security updates (password).
+ */
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAppStore } from "../store/useAppStore";
@@ -6,6 +11,14 @@ import { User, Lock, Save } from "lucide-react";
 import { toast } from "./Toast";
 import Modal from "./Modal";
 
+/**
+ * SettingsModal component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Whether the modal is visible.
+ * @param {Function} props.onClose - Callback to close the modal.
+ */
 const SettingsModal = ({ isOpen, onClose }) => {
   const { user, token, updateUser } = useAppStore();
   const [name, setName] = useState("");
@@ -15,12 +28,21 @@ const SettingsModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("profile"); // 'profile' or 'security'
 
+  /**
+   * Effect to synchronize the local name state with the user's name from the store.
+   */
   useEffect(() => {
     if (user) {
       setName(user.name || "");
     }
   }, [user, isOpen]);
 
+  /**
+   * Handles the profile update form submission.
+   * Updates the user's display name.
+   * @async
+   * @param {React.FormEvent} e - Form event.
+   */
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,6 +62,12 @@ const SettingsModal = ({ isOpen, onClose }) => {
     }
   };
 
+  /**
+   * Handles the password update form submission.
+   * Validates and updates the user's password.
+   * @async
+   * @param {React.FormEvent} e - Form event.
+   */
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {

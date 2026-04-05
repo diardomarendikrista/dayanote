@@ -1,6 +1,21 @@
+/**
+ * @fileoverview UserProfile component for the Dashboard Sidebar.
+ * Displays user information (name, avatar) and provides access to settings and logout.
+ */
+
 import { LogOut } from "lucide-react";
 import { cn } from "../../utils/cn";
 
+/**
+ * UserProfile component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {Object} props.user - The current user object.
+ * @param {Function} props.onLogout - Callback to initiate logout.
+ * @param {Function} props.onOpenSettings - Callback to open the settings modal.
+ * @returns {React.ReactElement}
+ */
 const UserProfile = ({ user, onLogout, onOpenSettings }) => {
   return (
     <div className="p-8 border-t border-border bg-sidebar mt-auto">

@@ -1,18 +1,17 @@
-# DayaNote: Collaborative Intelligence Memorandum System
+# DayaNote: Collaborative Note
 
-DayaNote is a professional, high-performance collaborative note-taking application designed with an industrial "Daya Lima" aesthetic. It features real-time synchronization, granular permissions, and premium UX optimizations.
+DayaNote is a collaborative note application. It features real-time synchronization, collaborative permissions, and UX optimizations.
 
 ---
 
 ## Key Features
 
 - **Real-time Collaboration**: Powered by **Yjs** and **Hocuspocus** for sub-millisecond sync.
-- **Smart Navigation History**: Optimized browser history with `push`/`replace` logic and query-param note selection.
+- **Navigation History**: Optimized browser history with `push`/`replace` logic and query-param note selection.
 - **Progressive Web App (PWA)**: Full offline support and mobile-first experience with maskable icons and standalone mode.
-- **Advanced Permissions**: Manage collaborators with SPECIFIC roles (**OWNER**, **EDITOR**, **VIEWER**).
-- **Security Auth Guard**: Automated redirects and intelligent path protection for authenticated sessions.
+- **Permissions**: Manage collaborators with SPECIFIC roles (**OWNER**, **EDITOR**, **VIEWER**).
 - **Mobile UX Enhancements**: Dedicated "Recent Activity" section and unified navigation for mobile devices.
-- **Premium Industrial Design**: Built with Tailwind CSS v4, 'Outfit' typography, and a refined dark aesthetic.
+- **Industrial Design**: Built with Tailwind CSS v4, 'Outfit' typography, and a refined dark aesthetic.
 
 ---
 
@@ -68,4 +67,4 @@ npm run dev
 
 ---
 
-_DayaNote v1.3.0 | Premium Collaborative Intelligence_
+\_DayaNote | Collaborative Note

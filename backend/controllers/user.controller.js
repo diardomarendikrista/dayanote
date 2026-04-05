@@ -1,7 +1,20 @@
+/**
+ * @fileoverview User controller handling user profile updates and password management.
+ */
+
 const bcrypt = require('bcrypt');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+/**
+ * Updates the user's profile information, including name and password.
+ * Implements security checks when changing passwords.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.user - Authenticated user info.
+ * @param {Object} req.body - Update fields (name, password, currentPassword).
+ * @param {Object} res - Express response object.
+ */
 exports.updateProfile = async (req, res) => {
   try {
     const { name, password, currentPassword } = req.body;
@@ -15,8 +28,13 @@ exports.updateProfile = async (req, res) => {
     const updateData = {};
     if (name) updateData.name = name;
 
+    /**
+     * Handle password update logic.
+     */
     if (password) {
-      // If user HAS a password, they must provide the current one to change it
+      /**
+       * If user ALREADY has a password set, they must provide the current one to change it.
+       */
       if (user.password && user.password !== '') {
         if (!currentPassword) {
           return res.status(400).json({ error: 'Current password is required to set a new one' });
@@ -27,6 +45,9 @@ exports.updateProfile = async (req, res) => {
         }
       }
       
+      /**
+       * Hash the new password before storing it.
+       */
       updateData.password = await bcrypt.hash(password, 10);
     }
 

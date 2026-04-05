@@ -1,8 +1,16 @@
+/**
+ * @fileoverview Database utility functions.
+ * Provides helper methods for database-wide operations like backup data extraction.
+ */
+
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 /**
- * Fetches all data from the database for backup purposes.
+ * Fetches all relevant data (users, notes, permissions) from the database for backup purposes.
+ * Includes a timestamp and a version tag.
+ * 
+ * @async
  * @returns {Promise<{users: Array, notes: Array, permissions: Array, timestamp: string, version: string}>}
  */
 const getBackupData = async () => {

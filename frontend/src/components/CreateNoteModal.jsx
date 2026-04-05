@@ -1,11 +1,30 @@
+/**
+ * @fileoverview Modal component for creating a new note.
+ * Includes a form for entering the note title and handles submission.
+ */
+
 import { useState } from "react";
 import Modal from "./Modal";
 import { cn } from "../utils/cn";
 import { Plus, Check, FileText } from "lucide-react";
 
+/**
+ * CreateNoteModal component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Whether the modal is visible.
+ * @param {Function} props.onClose - Callback to close the modal.
+ * @param {Function} props.onCreate - Callback triggered when the note is created, receives the title.
+ * @param {boolean} [props.loading=false] - Whether the modal is in a loading state.
+ */
 const CreateNoteModal = ({ isOpen, onClose, onCreate, loading = false }) => {
   const [title, setTitle] = useState("");
 
+  /**
+   * Handles the form submission for creating a new note.
+   * @param {React.FormEvent} e - Form event.
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -13,6 +32,9 @@ const CreateNoteModal = ({ isOpen, onClose, onCreate, loading = false }) => {
     setTitle(""); // Reset for next time
   };
 
+  /**
+   * Footer content containing action buttons.
+   */
   const footer = (
     <>
       <button

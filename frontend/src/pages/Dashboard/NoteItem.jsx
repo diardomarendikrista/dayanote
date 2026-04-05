@@ -1,6 +1,25 @@
+/**
+ * @fileoverview NoteItem component.
+ * Represents a single note card in lists (e.g., Sidebar, EmptyState).
+ * Displays title, access status (Public, Shared, Private), and ID.
+ */
+
 import { FileText, Lock, Globe, Users, ChevronRight } from "lucide-react";
 import { cn } from "../../utils/cn";
 
+/**
+ * NoteItem component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {Object} props.note - The note object to display.
+ * @param {boolean} [props.isActive] - Whether this note is currently selected.
+ * @param {Function} props.onClick - Callback when the note item is clicked.
+ * @param {string} props.userId - ID of the current user (for permission check).
+ * @param {boolean} [props.showChevron=false] - Whether to show a trailing chevron icon.
+ * @param {boolean} [props.compact=false] - Whether to use a compact layout.
+ * @returns {React.ReactElement}
+ */
 const NoteItem = ({
   note,
   isActive,
@@ -9,6 +28,11 @@ const NoteItem = ({
   showChevron = false,
   compact = false,
 }) => {
+  /**
+   * Determines which status icon to display based on note permissions.
+   * @param {number} [size=10] - Size of the icon.
+   * @returns {React.ReactElement}
+   */
   const getStatusIcon = (size = 10) => {
     const isShared =
       !note.isPublic &&
@@ -38,6 +62,10 @@ const NoteItem = ({
     );
   };
 
+  /**
+   * Returns a human-readable status text for the note.
+   * @returns {string}
+   */
   const getStatusText = () => {
     const isShared =
       !note.isPublic &&
@@ -71,7 +99,7 @@ const NoteItem = ({
               className={cn(
                 "transition-colors",
                 isActive
-                  ? "text-white"
+                   ? "text-white"
                   : "text-muted-foreground group-hover:text-brand-primary",
               )}
             />

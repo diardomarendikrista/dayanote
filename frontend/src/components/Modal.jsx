@@ -1,6 +1,26 @@
+/**
+ * @fileoverview Generic Modal component with consistent styling.
+ * Acts as a base for other specialized modals in the application.
+ */
+
 import { X } from "lucide-react";
 import { cn } from "../utils/cn";
 
+/**
+ * Modal component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Whether the modal is visible.
+ * @param {Function} props.onClose - Callback to close the modal.
+ * @param {string} props.title - Main title text.
+ * @param {string} [props.subtitle] - Optional subtitle text.
+ * @param {React.ReactNode} props.children - Modal body content.
+ * @param {React.ReactNode} [props.footer] - Optional footer content (usually buttons).
+ * @param {string} [props.maxWidth="max-w-lg"] - Tailwind max-width class.
+ * @param {boolean} [props.showCloseBtn=true] - Whether to show the close (X) button in the header.
+ * @returns {React.ReactElement|null}
+ */
 const Modal = ({
   isOpen,
   onClose,

@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Note page component.
+ * Displays a single note with the `CollaborativeEditor`.
+ * Handles access control (public/private), real-time socket events for title updates and deletions,
+ * and different view modes (Editor vs. Viewer).
+ */
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
@@ -10,6 +17,12 @@ import { useRef } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
 
+/**
+ * NotePage component.
+ * 
+ * @component
+ * @returns {React.ReactElement}
+ */
 const NotePage = () => {
   const { id } = useParams();
   const { token, theme, toggleTheme } = useAppStore();
@@ -18,6 +31,12 @@ const NotePage = () => {
   const [loading, setLoading] = useState(true);
   const socketRef = useRef(null);
 
+  /**
+   * Fetches the note data from the backend.
+   * Handles various error states (403 Forbidden, 404 Not Found).
+   * @async
+   * @param {boolean} [isInitial=true] - Whether this is the initial page load.
+   */
   const fetchNote = async (isInitial = true) => {
     if (isInitial) setLoading(true);
     try {
@@ -38,11 +57,17 @@ const NotePage = () => {
     }
   };
 
+  /**
+   * Effect to trigger note fetching when the ID or token changes.
+   */
   useEffect(() => {
     fetchNote();
   }, [id, token]);
 
-  // Real-time synchronization
+  /**
+   * Effect to handle real-time synchronization via WebSockets.
+   * Listens for access checks, title updates, and deletion events.
+   */
   useEffect(() => {
     const socket = io(API_URL, { auth: { token } });
     socketRef.current = socket;

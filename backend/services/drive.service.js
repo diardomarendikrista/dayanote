@@ -1,6 +1,14 @@
+/**
+ * @fileoverview Google Drive service for managing remote backups.
+ * Handles OAuth2 authentication and file operations (list, create, delete).
+ */
+
 const { google } = require('googleapis');
 const fs = require('fs');
 
+/**
+ * Initialize Google OAuth2 client with credentials from environment variables.
+ */
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET
@@ -10,15 +18,26 @@ oauth2Client.setCredentials({
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN
 });
 
+/**
+ * Initialize Google Drive API client (v3).
+ */
 const drive = google.drive({
   version: 'v3',
   auth: oauth2Client
 });
 
+/**
+ * Root folder ID on Google Drive where backups will be stored.
+ */
 const DRIVE_ROOT_ID = process.env.DRIVE_ROOT_ID;
 
 /**
- * Ensures a 'Backups' folder exists under the root and returns its ID.
+ * Ensures a 'Backups' folder exists under the designated root on Google Drive.
+ * If the folder exists, returns its ID; otherwise, creates it and returns the new ID.
+ * 
+ * @async
+ * @returns {Promise<string>} The ID of the 'Backups' folder.
+ * @throws {Error} If folder lookup or creation fails.
  */
 const getOrCreateBackupFolder = async () => {
   const folderName = 'Backups';
@@ -33,7 +52,9 @@ const getOrCreateBackupFolder = async () => {
       return folders[0].id;
     }
 
-    // Create the folder if it doesn't exist
+    /**
+     * Folder doesn't exist, so we create it.
+     */
     const fileMetadata = {
       name: folderName,
       mimeType: 'application/vnd.google-apps.folder',
@@ -54,10 +75,13 @@ const getOrCreateBackupFolder = async () => {
 };
 
 /**
- * Uploads a local file to Google Drive.
- * @param {string} filePath - Local path to the file.
- * @param {string} fileName - Name for the file on Drive.
- * @returns {Promise<string>} - The ID of the uploaded file on Drive.
+ * Uploads a local file to the 'Backups' folder on Google Drive.
+ * 
+ * @async
+ * @param {string} filePath - Local filesystem path to the file to be uploaded.
+ * @param {string} fileName - Destination name for the file on Google Drive.
+ * @returns {Promise<string>} The ID of the uploaded file on Drive.
+ * @throws {Error} If upload fails.
  */
 const uploadBackup = async (filePath, fileName) => {
   try {
@@ -85,8 +109,11 @@ const uploadBackup = async (filePath, fileName) => {
 };
 
 /**
- * Removes files from Drive that are older than the specified retention period.
- * @param {number} retentionDays - Number of days to keep backups.
+ * Identifies and deletes backup files on Google Drive that are older than a specific retention period.
+ * 
+ * @async
+ * @param {number} retentionDays - The maximum age of a backup in days.
+ * @returns {Promise<void>}
  */
 const cleanupOldBackups = async (retentionDays) => {
   const cutoffDate = new Date();
@@ -96,6 +123,9 @@ const cleanupOldBackups = async (retentionDays) => {
   try {
     const backupFolderId = await getOrCreateBackupFolder();
 
+    /**
+     * Query for JSON files in the backup folder created before the cutoff date.
+     */
     const response = await drive.files.list({
       q: `'${backupFolderId}' in parents and mimeType='application/json' and createdTime < '${rfc3339Date}'`,
       fields: 'files(id, name, createdTime)',

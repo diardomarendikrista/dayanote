@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Password reset page component.
+ * Forced upon users who have an active `needsReset` flag (e.g., after an administrative reset).
+ * Ensures users set a secure, personalized password before accessing their workspace.
+ */
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -5,6 +11,12 @@ import { useAppStore } from "../store/useAppStore";
 import { cn } from "../utils/cn";
 import { Lock, ShieldCheck, AlertCircle } from "lucide-react";
 
+/**
+ * ResetPassword component.
+ * 
+ * @component
+ * @returns {React.ReactElement}
+ */
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -13,6 +25,11 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const { user, token, needsReset, updateUser, setUser } = useAppStore();
 
+  /**
+   * Effect to enforce redirection rules:
+   * 1. If the user doesn't need a reset, go to the dashboard.
+   * 2. If the user isn't logged in, go to the login page.
+   */
   useEffect(() => {
     // If user is logged in but doesn't need reset, redirect to dashboard
     if (user && !needsReset) {
@@ -24,6 +41,12 @@ const ResetPassword = () => {
     }
   }, [user, needsReset, navigate]);
 
+  /**
+   * Handles the password reset form submission.
+   * Validates the new password and updates it via the user profile API.
+   * @async
+   * @param {React.FormEvent} e - Form event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

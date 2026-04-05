@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Modal component for managing note settings and access control.
+ * Handles public sharing, role management, and collaborator invitations.
+ */
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -16,13 +21,26 @@ import Modal from "./Modal";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
 
+/**
+ * NoteSettingsModal component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Whether the modal is visible.
+ * @param {Function} props.onClose - Callback to close the modal.
+ * @param {Object} props.note - The note object being configured.
+ * @param {Function} props.onUpdate - Callback to update the local note state.
+ * @param {string} props.token - Authentication token.
+ */
 const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("VIEWER");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Fetch full note data (with collaborator list) whenever modal opens
+  /**
+   * Effect to refresh full note details (including collaborators) when the modal opens.
+   */
   useEffect(() => {
     if (isOpen && note?.id) {
       const fetchFullNote = async () => {
@@ -41,6 +59,10 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
 
   if (!note) return null;
 
+  /**
+   * Toggles the note's public visibility.
+   * @async
+   */
   const handleTogglePublic = async () => {
     try {
       const res = await axios.put(
@@ -55,6 +77,11 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
     }
   };
 
+  /**
+   * Updates the default role for public access.
+   * @async
+   * @param {string} newRole - The new role ('VIEWER' or 'EDITOR').
+   */
   const handleUpdatePublicRole = async (newRole) => {
     try {
       const res = await axios.put(
@@ -69,6 +96,11 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
     }
   };
 
+  /**
+   * Sends an invitation to a user by email to collaborate on the note.
+   * @async
+   * @param {React.FormEvent} e - Form event.
+   */
   const handleAddPermission = async (e) => {
     e.preventDefault();
     if (!email) return;
@@ -93,6 +125,12 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
     }
   };
 
+  /**
+   * Updates the permission role of an existing collaborator.
+   * @async
+   * @param {string} targetEmail - The email of the collaborator.
+   * @param {string} newRole - The new role assigned.
+   */
   const handleUpdatePermission = async (targetEmail, newRole) => {
     try {
       await axios.post(
@@ -111,6 +149,11 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
     }
   };
 
+  /**
+   * Removes a collaborator from the note.
+   * @async
+   * @param {string} userId - The user ID of the collaborator to remove.
+   */
   const handleRemovePermission = async (userId) => {
     try {
       await axios.delete(
@@ -127,6 +170,9 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
     }
   };
 
+  /**
+   * Copies the note's shareable link to the clipboard.
+   */
   const copyLink = () => {
     const shareUrl = `${window.location.origin}/note/${note.id}`;
     navigator.clipboard.writeText(shareUrl);
@@ -135,6 +181,9 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
     toast.success("Link copied!");
   };
 
+  /**
+   * Footer content containing the Close button.
+   */
   const footer = (
     <button
       onClick={onClose}

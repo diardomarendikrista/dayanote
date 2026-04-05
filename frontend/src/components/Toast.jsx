@@ -1,7 +1,16 @@
+/**
+ * @fileoverview Toast notification system.
+ * Provides a global `toast` object for displaying success, error, and info messages.
+ * Includes a `ToastContainer` that must be rendered at the root of the app.
+ */
+
 import { useEffect, useState } from "react";
 import { Check, Info, AlertTriangle, X } from "lucide-react";
 import { cn } from "../utils/cn";
 
+/**
+ * Toast configuration for different notification types.
+ */
 const ICONS = {
   success: {
     icon: Check,
@@ -26,15 +35,31 @@ const ICONS = {
   },
 };
 
-// Singleton toast manager
+/**
+ * Singleton toast manager.
+ * Internally used to connect the `toast` object calls to the `ToastContainer` state.
+ */
 let addToastFn = null;
 
+/**
+ * Global toast API.
+ */
 export const toast = {
   success: (message) => addToastFn?.({ message, type: "success" }),
   error: (message) => addToastFn?.({ message, type: "error" }),
   info: (message) => addToastFn?.({ message, type: "info" }),
 };
 
+/**
+ * Individual toast item component.
+ * Handles its own entrance/exit animations and auto-dismiss timer.
+ * 
+ * @param {Object} props - Component props.
+ * @param {number} props.id - Unique ID of the toast.
+ * @param {string} props.message - Message to display.
+ * @param {string} props.type - Type of toast ('success', 'error', 'info').
+ * @param {Function} props.onRemove - Callback to remove the toast from global state.
+ */
 const ToastItem = ({ id, message, type, onRemove }) => {
   const { icon: Icon, bg, border, text, dot } = ICONS[type] || ICONS.info;
   const [visible, setVisible] = useState(false);
@@ -84,6 +109,12 @@ const ToastItem = ({ id, message, type, onRemove }) => {
   );
 };
 
+/**
+ * Toast container component.
+ * Manages the list of active toasts and provides the bridge to the global `toast` API.
+ * 
+ * @returns {React.ReactElement}
+ */
 const ToastContainer = () => {
   const [toasts, setToasts] = useState([]);
 
@@ -97,6 +128,10 @@ const ToastContainer = () => {
     };
   }, []);
 
+  /**
+   * Internal helper to remove a toast by ID.
+   * @param {number} id - The ID of the toast to remove.
+   */
   const remove = (id) => setToasts((prev) => prev.filter((t) => t.id !== id));
 
   return (

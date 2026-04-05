@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Collaborative Editor component using TipTap and Y.js.
+ * Handles real-time synchronization via Hocuspocus and offline persistence via IndexedDB.
+ */
+
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
@@ -11,7 +16,16 @@ import { useAppStore } from "../store/useAppStore";
 import { Lock, Eye } from "lucide-react";
 import { cn } from "../utils/cn";
 
-// Toolbar button component
+/**
+ * A reusable toolbar button for the editor.
+ * 
+ * @param {Object} props - Component props.
+ * @param {Function} props.onClick - Click handler.
+ * @param {boolean} props.isActive - Whether the styling for this button is currently active.
+ * @param {boolean} props.disabled - Whether the button is disabled.
+ * @param {string} props.title - Tooltip text.
+ * @param {React.ReactNode} props.children - Icon or text content.
+ */
 const ToolbarButton = ({ onClick, isActive, disabled, title, children }) => (
   <button
     onClick={onClick}
@@ -29,7 +43,14 @@ const ToolbarButton = ({ onClick, isActive, disabled, title, children }) => (
   </button>
 );
 
-// Toolbar component
+/**
+ * The editor toolbar containing formatting options.
+ * Shows a simplified "Read Only" indicator if the user cannot edit.
+ * 
+ * @param {Object} props - Component props.
+ * @param {Object} props.editor - TipTap editor instance.
+ * @param {boolean} props.readOnly - Whether the editor is in read-only mode.
+ */
 const EditorToolbar = ({ editor, readOnly }) => {
   if (!editor || readOnly)
     return (
@@ -185,6 +206,16 @@ const EditorToolbar = ({ editor, readOnly }) => {
   );
 };
 
+/**
+ * The active editor instance wrapper.
+ * Manages TipTap configuration and update events.
+ * 
+ * @param {Object} props - Component props.
+ * @param {Y.Doc} props.ydoc - The Y.js document instance.
+ * @param {boolean} props.readOnly - Whether the editor is in read-only mode.
+ * @param {Function} props.onUpdate - Callback triggered when the content changes.
+ * @param {React.MutableRefObject<boolean>} props.isSynced - Ref tracking if initial synchronization is complete.
+ */
 const EditorInstance = ({ ydoc, readOnly, onUpdate, isSynced }) => {
 
   const editor = useEditor(
@@ -204,7 +235,10 @@ const EditorInstance = ({ ydoc, readOnly, onUpdate, isSynced }) => {
         },
       },
       onUpdate: ({ editor }) => {
-        // Only trigger update if the editor is focused (user interaction) OR if it's already synced (remote interaction)
+        /**
+         * Trigger onUpdate callback only for user-initiated changes
+         * or after initial synchronization to avoid redundant save triggers on load.
+         */
         if ((editor.isFocused || isSynced.current) && typeof onUpdate === "function") {
           onUpdate();
         }
@@ -228,12 +262,25 @@ const EditorInstance = ({ ydoc, readOnly, onUpdate, isSynced }) => {
   );
 };
 
+/**
+ * Main Collaborative Editor component.
+ * Sets up Y.js document, IndexedDB persistence, and Hocuspocus WebSocket provider.
+ * 
+ * @param {Object} props - Component props.
+ * @param {string} props.noteId - The ID of the note to load.
+ * @param {Function} props.onUpdate - Callback triggered when the content changes.
+ * @param {boolean} [props.readOnly=false] - Whether the editor is in read-only mode.
+ * @returns {React.ReactElement}
+ */
 const CollaborativeEditor = ({ noteId, onUpdate, readOnly = false }) => {
   const { token } = useAppStore();
   const [ydoc, setYdoc] = useState(null);
   const isSynced = useRef(false);
   const [status, setStatus] = useState("connecting");
 
+  /**
+   * Effect to initialize and clean up collaborative document resources.
+   */
   useEffect(() => {
     if (!noteId) return;
 
@@ -241,7 +288,15 @@ const CollaborativeEditor = ({ noteId, onUpdate, readOnly = false }) => {
     setStatus("connecting");
 
     const doc = new Y.Doc();
+    
+    /**
+     * Local persistence using IndexedDB.
+     */
     const idb = new IndexeddbPersistence(noteId, doc);
+    
+    /**
+     * WebSocket provider for real-time synchronization.
+     */
     const hp = new HocuspocusProvider({
       url: import.meta.env.VITE_WS_URL || "ws://localhost:4015",
       name: noteId,
@@ -251,13 +306,19 @@ const CollaborativeEditor = ({ noteId, onUpdate, readOnly = false }) => {
       onDisconnect: () => setStatus("offline"),
       onAuthenticationFailed: () => setStatus("denied"),
       onSynced: () => {
-        // Delay slightly to prevent initial load movement
+        /**
+         * Mark as synced after initial load.
+         * Delay prevents race conditions with local state during massive initial updates.
+         */
         setTimeout(() => {
           isSynced.current = true;
         }, 800);
       },
     });
 
+    /**
+     * Slight delay for Y.js initialization before rendering the editor.
+     */
     const timer = setTimeout(() => setYdoc(doc), 50);
 
     return () => {
@@ -268,6 +329,9 @@ const CollaborativeEditor = ({ noteId, onUpdate, readOnly = false }) => {
     };
   }, [noteId, token]);
 
+  /**
+   * Render Access Denied state.
+   */
   if (status === "denied") {
     return (
       <div
@@ -290,6 +354,9 @@ const CollaborativeEditor = ({ noteId, onUpdate, readOnly = false }) => {
     );
   }
 
+  /**
+   * Render Loading/Synchronizing state.
+   */
   if (!ydoc) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[400px] space-y-4">
@@ -307,7 +374,7 @@ const CollaborativeEditor = ({ noteId, onUpdate, readOnly = false }) => {
 
   return (
     <div className="relative">
-      {/* Status badge */}
+      {/* Real-time synchronization status badge */}
       <div className="absolute -top-10 right-0 flex items-center gap-2">
         <div
           className={cn(

@@ -1,9 +1,21 @@
+/**
+ * @fileoverview Login page component.
+ * Handles user authentication, token storage, and redirection to the dashboard.
+ * Includes support for mandatory password reset after administrative resets.
+ */
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
 import { cn } from "../utils/cn";
 
+/**
+ * Login component.
+ * 
+ * @component
+ * @returns {React.ReactElement}
+ */
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,12 +23,21 @@ const Login = () => {
   const navigate = useNavigate();
   const { setUser, token } = useAppStore();
 
+  /**
+   * Redirect to dashboard if user is already authenticated.
+   */
   useEffect(() => {
     if (token) {
       navigate("/dashboard", { replace: true });
     }
   }, [token, navigate]);
 
+  /**
+   * Handles the login form submission.
+   * Authenticates the user and navigates either to the dashboard or to the password reset page.
+   * @async
+   * @param {React.FormEvent} e - Form event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

@@ -1,3 +1,8 @@
+/*
+ * App-wide styles for the landing page and common UI elements.
+ */
+
+/* Counter component styles */
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -17,6 +22,7 @@
   }
 }
 
+/* Hero section with logo animations */
 .hero {
   position: relative;
 
@@ -38,6 +44,7 @@
     position: absolute;
   }
 
+  /* Framework logo styling and positioning */
   .framework {
     z-index: 1;
     top: 34px;
@@ -46,6 +53,7 @@
       scale(1.4);
   }
 
+  /* Vite logo styling and positioning */
   .vite {
     z-index: 0;
     top: 107px;
@@ -56,6 +64,7 @@
   }
 }
 
+/* Central layout for content */
 #center {
   display: flex;
   flex-direction: column;
@@ -70,6 +79,7 @@
   }
 }
 
+/* Next steps section layout */
 #next-steps {
   display: flex;
   border-top: 1px solid var(--border);
@@ -95,6 +105,7 @@
   }
 }
 
+/* Documentation block styling */
 #docs {
   border-right: 1px solid var(--border);
 
@@ -104,6 +115,7 @@
   }
 }
 
+/* List of external links in next steps */
 #next-steps ul {
   list-style: none;
   padding: 0;
@@ -153,6 +165,7 @@
   }
 }
 
+/* Footer-like spacer */
 #spacer {
   height: 88px;
   border-top: 1px solid var(--border);
@@ -161,6 +174,7 @@
   }
 }
 
+/* Decorative visual ticks */
 .ticks {
   position: relative;
   width: 100%;

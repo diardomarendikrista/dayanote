@@ -1,7 +1,26 @@
+/**
+ * @fileoverview EmptyState component for the Dashboard.
+ * Displays a welcome message, a call to action for creating notes,
+ * and a mobile-specific search interface when no note is currently active.
+ */
+
 import { FileText, Plus, Search, X } from "lucide-react";
 import { cn } from "../../utils/cn";
 import NoteItem from "./NoteItem";
 
+/**
+ * EmptyState component.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {Object} props.user - Current user object.
+ * @param {Array} [props.notes=[]] - List of filtered notes.
+ * @param {string} [props.searchTerm=""] - Current search query.
+ * @param {Function} props.onSearchChange - Callback for search input changes.
+ * @param {Function} props.onSelectNote - Callback for selecting a note.
+ * @param {Function} props.onCreateNote - Callback for creating a new note.
+ * @returns {React.ReactElement}
+ */
 const EmptyState = ({
   user,
   notes = [],
@@ -10,6 +29,9 @@ const EmptyState = ({
   onSelectNote,
   onCreateNote,
 }) => {
+  /**
+   * Notes sorted by modification date for display in the mobile list.
+   */
   const sortedNotes = [...notes].sort(
     (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
   );
