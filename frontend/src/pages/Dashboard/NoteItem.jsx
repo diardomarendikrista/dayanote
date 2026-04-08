@@ -1,6 +1,6 @@
 /**
  * @fileoverview NoteItem component.
- * Represents a single note card in lists (e.g., Sidebar, EmptyState).
+ * Represents a single note card in lists (e.g., Sidebar, DashboardHome).
  * Displays title, access status (Public, Shared, Private), and ID.
  */
 

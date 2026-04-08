@@ -24,13 +24,13 @@ import { cn } from "../../utils/cn";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import MobileHeader from "./MobileHeader";
-import EmptyState from "./EmptyState";
+import DashboardHome from "./DashboardHome/index";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
 
 /**
  * Dashboard component.
- * 
+ *
  * @component
  * @returns {React.ReactElement}
  */
@@ -40,6 +40,7 @@ const Dashboard = () => {
   const activeNoteId = searchParams.get("note");
   const [notes, setNotes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
   const [saveStatus, setSaveStatus] = useState("idle");
 
   // Modal States
@@ -173,11 +174,14 @@ const Dashboard = () => {
    * @async
    */
   const fetchNotes = async () => {
+    setIsLoadingNotes(true);
     try {
       const res = await axios.get("/api/notes");
       setNotes(res.data);
     } catch (err) {
       toast.error("Failed to load notes.");
+    } finally {
+      setIsLoadingNotes(false);
     }
   };
 
@@ -273,7 +277,7 @@ const Dashboard = () => {
 
   /**
    * Captures initial title on focus for change detection.
-   * @param {React.FocusEvent} e 
+   * @param {React.FocusEvent} e
    */
   const handleTitleFocus = (e) => {
     titleRef.current = e.target.value;
@@ -281,7 +285,7 @@ const Dashboard = () => {
 
   /**
    * Handles title updates in the UI and broadcasts changes via Socket.io.
-   * @param {React.ChangeEvent} e 
+   * @param {React.ChangeEvent} e
    */
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
@@ -307,7 +311,7 @@ const Dashboard = () => {
 
   /**
    * Triggers the debounced API save when the title field loses focus.
-   * @param {React.FocusEvent} e 
+   * @param {React.FocusEvent} e
    */
   const handleTitleBlur = (e) => {
     const newTitle = e.target.value;
@@ -325,7 +329,7 @@ const Dashboard = () => {
 
   /**
    * Callback for child components to update the local note list when a single note changes.
-   * @param {Object} updatedNote 
+   * @param {Object} updatedNote
    */
   const updateActiveNoteInList = (updatedNote) => {
     setNotes((prev) => {
@@ -435,10 +439,11 @@ const Dashboard = () => {
             </div>
           </>
         ) : (
-          <EmptyState
+          <DashboardHome
             user={user}
             notes={filteredNotes}
             searchTerm={searchTerm}
+            isLoading={isLoadingNotes}
             onSearchChange={setSearchTerm}
             onSelectNote={(id) => {
               const isReturningFromHome = !activeNoteId;
