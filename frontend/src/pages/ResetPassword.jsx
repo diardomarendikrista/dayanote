@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../axios/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
 import { cn } from "../utils/cn";
@@ -63,17 +63,13 @@ const ResetPassword = () => {
 
     setLoading(true);
     try {
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_URL || "http://localhost:4015"}/api/users/profile`,
-        { password },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.put("/api/users/profile", { password });
 
       // Successfully updated password
       updateUser(res.data.user);
       
       // Clear needsReset flag
-      localStorage.removeItem('needsReset');
+      localStorage.removeItem('dayanote_needsReset');
       // We can't easily update the store state directly if it's not a setter,
       // but setUser re-runs the logic. Or we can just logout and login.
       // Easiest is to just manually update the store if possible.

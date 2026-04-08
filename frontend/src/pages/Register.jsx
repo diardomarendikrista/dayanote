@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../axios/axiosInstance";
 import { useNavigate, Link } from "react-router-dom";
 import { cn } from "../utils/cn";
 import { useAppStore } from "../store/useAppStore";
@@ -42,10 +42,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL || "http://localhost:4015"}/api/auth/register`,
-        { name, email, password },
-      );
+      await axios.post("/api/auth/register", { name, email, password });
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed");

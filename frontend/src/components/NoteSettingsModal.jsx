@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../axios/axiosInstance";
 import {
   Globe,
   Lock,
@@ -32,7 +32,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4015";
  * @param {Function} props.onUpdate - Callback to update the local note state.
  * @param {string} props.token - Authentication token.
  */
-const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
+const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate }) => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("VIEWER");
   const [loading, setLoading] = useState(false);
@@ -45,9 +45,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
     if (isOpen && note?.id) {
       const fetchFullNote = async () => {
         try {
-          const res = await axios.get(`${API_URL}/api/notes/${note.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const res = await axios.get(`/api/notes/${note.id}`);
           onUpdate(res.data);
         } catch (err) {
           console.error("Failed to refresh note details", err);
@@ -55,7 +53,7 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
       };
       fetchFullNote();
     }
-  }, [isOpen, note?.id, token]);
+  }, [isOpen, note?.id]);
 
   if (!note) return null;
 
@@ -65,11 +63,10 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
    */
   const handleTogglePublic = async () => {
     try {
-      const res = await axios.put(
-        `${API_URL}/api/notes/${note.id}`,
-        { isPublic: !note.isPublic, publicRole: note.publicRole || "VIEWER" },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const res = await axios.put(`/api/notes/${note.id}`, {
+        isPublic: !note.isPublic,
+        publicRole: note.publicRole || "VIEWER",
+      });
       onUpdate(res.data);
       toast.info(`Note is now ${!note.isPublic ? "Public" : "Private"}`);
     } catch (err) {
@@ -84,11 +81,9 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
    */
   const handleUpdatePublicRole = async (newRole) => {
     try {
-      const res = await axios.put(
-        `${API_URL}/api/notes/${note.id}`,
-        { publicRole: newRole },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const res = await axios.put(`/api/notes/${note.id}`, {
+        publicRole: newRole,
+      });
       onUpdate(res.data);
       toast.info(`Public access changed to ${newRole}`);
     } catch (err) {
@@ -106,17 +101,11 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
     if (!email) return;
     setLoading(true);
     try {
-      await axios.post(
-        `${API_URL}/api/notes/${note.id}/permissions`,
-        { email, role },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      await axios.post(`/api/notes/${note.id}/permissions`, { email, role });
       toast.success(`Shared with ${email}`);
       setEmail("");
       // Refresh note data
-      const res = await axios.get(`${API_URL}/api/notes/${note.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(`/api/notes/${note.id}`);
       onUpdate(res.data);
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to share");
@@ -133,16 +122,13 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
    */
   const handleUpdatePermission = async (targetEmail, newRole) => {
     try {
-      await axios.post(
-        `${API_URL}/api/notes/${note.id}/permissions`,
-        { email: targetEmail, role: newRole },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      await axios.post(`/api/notes/${note.id}/permissions`, {
+        email: targetEmail,
+        role: newRole,
+      });
       toast.success(`Role updated for ${targetEmail}`);
       // Refresh note data
-      const res = await axios.get(`${API_URL}/api/notes/${note.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(`/api/notes/${note.id}`);
       onUpdate(res.data);
     } catch (err) {
       toast.error("Failed to update role");
@@ -157,13 +143,10 @@ const NoteSettingsModal = ({ isOpen, onClose, note, onUpdate, token }) => {
   const handleRemovePermission = async (userId) => {
     try {
       await axios.delete(
-        `${API_URL}/api/notes/${note.id}/permissions/${userId}`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        `/api/notes/${note.id}/permissions/${userId}`
       );
       toast.success("Collaborator removed");
-      const res = await axios.get(`${API_URL}/api/notes/${note.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(`/api/notes/${note.id}`);
       onUpdate(res.data);
     } catch (err) {
       toast.error("Failed to remove collaborator");

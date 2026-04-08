@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.3.1",
+  "x-version-source": "src/store/useAppStore.js",
   "type": "module",
   "scripts": {
     "dev": "vite",

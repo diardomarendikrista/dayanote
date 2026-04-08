@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../axios/axiosInstance";
 import { useAppStore } from "../store/useAppStore";
 import { cn } from "../utils/cn";
 import { User, Lock, Save } from "lucide-react";
@@ -47,11 +47,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_URL || "http://localhost:4015"}/api/users/profile`,
-        { name },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.put("/api/users/profile", { name });
       updateUser(res.data.user);
       toast.success("Profile updated successfully");
       onClose();
@@ -81,11 +77,10 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
     setLoading(true);
     try {
-      await axios.put(
-        `${import.meta.env.VITE_API_URL || "http://localhost:4015"}/api/users/profile`,
-        { password: newPassword, currentPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.put("/api/users/profile", {
+        password: newPassword,
+        currentPassword,
+      });
       toast.success("Password changed successfully");
       setCurrentPassword("");
       setNewPassword("");

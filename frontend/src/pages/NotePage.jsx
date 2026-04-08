@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import axios from "../axios/axiosInstance";
 import CollaborativeEditor from "../components/CollaborativeEditor";
 import { useAppStore } from "../store/useAppStore";
 import { FileText, LogIn, Eye, Edit3, Globe, Sun, Moon } from "lucide-react";
@@ -40,8 +40,7 @@ const NotePage = () => {
   const fetchNote = async (isInitial = true) => {
     if (isInitial) setLoading(true);
     try {
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await axios.get(`${API_URL}/api/notes/${id}`, { headers });
+      const res = await axios.get(`/api/notes/${id}`);
       setNote(res.data);
       setError(null);
     } catch (err) {

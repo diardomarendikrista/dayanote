@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import axios from "axios";
+import axios from "../../axios/axiosInstance";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppStore } from "../../store/useAppStore";
 import CollaborativeEditor from "../../components/CollaborativeEditor";
@@ -135,9 +135,7 @@ const Dashboard = () => {
     socket.on("check_access", async ({ noteId }) => {
       if (activeNoteId === noteId) {
         try {
-          const res = await axios.get(`${API_URL}/api/notes/${noteId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const res = await axios.get(`/api/notes/${noteId}`);
           setNotes((prev) => {
             const updated = prev.map((n) =>
               n.id === noteId ? { ...n, ...res.data } : n,
@@ -176,9 +174,7 @@ const Dashboard = () => {
    */
   const fetchNotes = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/notes`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get("/api/notes");
       setNotes(res.data);
     } catch (err) {
       toast.error("Failed to load notes.");
@@ -200,11 +196,7 @@ const Dashboard = () => {
   const handleCreateNote = async (title) => {
     setIsCreatingNote(true);
     try {
-      const res = await axios.post(
-        `${API_URL}/api/notes`,
-        { title },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const res = await axios.post("/api/notes", { title });
       setNotes([res.data, ...notes]);
       setSearchParams({ note: res.data.id });
       setIsCreateModalOpen(false);
@@ -224,9 +216,7 @@ const Dashboard = () => {
     if (!noteToDelete) return;
     setIsDeletingNote(true);
     try {
-      await axios.delete(`${API_URL}/api/notes/${noteToDelete}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(`/api/notes/${noteToDelete}`);
       setNotes(notes.filter((n) => n.id !== noteToDelete));
       if (activeNoteId === noteToDelete) setSearchParams({});
       setIsDeleteModalOpen(false);
@@ -259,11 +249,7 @@ const Dashboard = () => {
       setSaveStatus("saving");
       titleSaveTimer.current = setTimeout(async () => {
         try {
-          const res = await axios.put(
-            `${API_URL}/api/notes/${noteId}`,
-            fields,
-            { headers: { Authorization: `Bearer ${token}` } },
-          );
+          const res = await axios.put(`/api/notes/${noteId}`, fields);
           setNotes((prev) => {
             const updated = prev.map((n) =>
               n.id === noteId ? { ...n, ...res.data } : n,
@@ -468,7 +454,6 @@ const Dashboard = () => {
         onClose={() => setIsNoteModalOpen(false)}
         note={activeNote}
         onUpdate={updateActiveNoteInList}
-        token={token}
       />
 
       <SettingsModal
