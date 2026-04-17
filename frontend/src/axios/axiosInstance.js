@@ -42,10 +42,7 @@ axiosInstance.interceptors.response.use(
     const { response } = error;
     
     // Check for token invalidation specific error message or 401 status
-    if (
-      response?.status === 401 || 
-      response?.data?.error === "Invalid token."
-    ) {
+    if (response?.status === 401) {
       // Clear local state and session
       useAppStore.getState().logout();
       

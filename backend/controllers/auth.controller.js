@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
         name,
       },
     });
-    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, process.env.JWT_SECRET);
     res.status(201).json({ message: 'User created successfully', userId: user.id, token });
   } catch (error) {
     res.status(400).json({ error: 'Registration failed: ' + error.message });
@@ -84,8 +84,7 @@ exports.login = async (req, res) => {
      */
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      process.env.JWT_SECRET
     );
     res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
   } catch (error) {

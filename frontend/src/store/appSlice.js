@@ -8,7 +8,7 @@ export const createAppSlice = (set) => ({
   isOnline: navigator.onLine,
 
   /** @type {string} Source of Truth for the application version */
-  version: "0.3.3",
+  version: "0.3.4",
 
   /**
    * Updates the global online status indicator.
